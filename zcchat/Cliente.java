@@ -57,43 +57,68 @@ public class Cliente {
 	}
 	
     public static void cliente_retrive_contacts_online() {
-        PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
-        out.println("retrieve_contacts");
+        try {
+            PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
+            out.println("retrieve_contacts");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
-        System.out.println(in.readLine());
+            BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
+            System.out.println(in.readLine());
+        
+        } catch (Exception e) {
+            System.out.println("Erro na comunicação: " + str(e));
+        }
     }
 
     public static void cliente_message_contacts_online() {
-        PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
-        out.println("message_contacts_on");
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
-        System.out.println(in.readLine());
+        try {
+            PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
+            out.println("message_contacts_on");
+    
+            BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
+            System.out.println(in.readLine());
+        
+        } catch (Exception e) {
+            System.out.println("Erro na comunicação: " + str(e));
+        }
     }
 
     public static void cliente_retrive_history() {
-        PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
-        out.println("retrive_history");
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
-        System.out.println(in.readLine());
+        try {
+            PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
+            out.println("retrive_history");
+    
+            BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
+            System.out.println(in.readLine());
+        
+        } catch (Exception e) {
+            System.out.println("Erro na comunicação: " + str(e));
+        }
     }
 
     public static void cliente_message_contacts_offline() {
-        PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
-        out.println("message_contacts_off");
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
-        System.out.println(in.readLine());
+        try {
+            PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
+            out.println("message_contacts_off");
+    
+            BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
+            System.out.println(in.readLine());
+        
+        } catch (Exception e) {
+            System.out.println("Erro na comunicação: " + str(e));
+        }
     }
 
     public static void cliente_contact_info() {
-        PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
-        out.println("contact_info");
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
-        System.out.println(in.readLine());
+        try {
+            PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
+            out.println("contact_info");
+    
+            BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
+            System.out.println(in.readLine());
+        
+        } catch (Exception e) {
+            System.out.println("Erro na comunicação: " + str(e));
+        }
     }
 
     public static void main(String[] args) {
