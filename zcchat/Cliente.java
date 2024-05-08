@@ -65,7 +65,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + str(e));
+            System.out.println("Erro na comunicação: " + e.to_string());
         }
     }
 
@@ -78,7 +78,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + str(e));
+            System.out.println("Erro na comunicação: " + e.to_string());
         }
     }
 
@@ -91,7 +91,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + str(e));
+            System.out.println("Erro na comunicação: " + e.to_string());
         }
     }
 
@@ -104,7 +104,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + str(e));
+            System.out.println("Erro na comunicação: " + e.to_string());
         }
     }
 
@@ -117,7 +117,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + str(e));
+            System.out.println("Erro na comunicação: " + e.to_string());
         }
     }
 
