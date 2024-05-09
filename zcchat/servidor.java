@@ -11,6 +11,8 @@ public class servidor {
     public static void main(String[] args) {
         int portNumber = 6792; // Porta na qual o servidor estará ouvindo
 
+        //TODO: Handler de porta que o blockz vai fazer
+
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
             System.out.println("S: Servidor TCP aguardando conexões na porta " + portNumber + "...");
 
@@ -45,6 +47,12 @@ class ClientHandler extends Thread {
             // Recebe dados do cliente
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             System.out.println("S: Mensagem recebida do cliente " + clientSocket.getInetAddress() + ": " + in.readLine());
+
+            // TODO: Identificar solicitação
+
+            // TODO: Chamar controller com a função solicitada
+
+            // TODO: Retornar par ao cliente com o resultado da solicitação
 
             // Envia dados de volta para o cliente
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);

@@ -3,7 +3,6 @@ package zcchat;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
 
 public class Cliente {
     private static Socket socket;
@@ -26,24 +25,24 @@ public class Cliente {
                 case 2:
                     // Precisa de outro switch para perguntar qual o contato da comunicação.
                     System.out.println("Verificando se o contato está online...");
-                    cliente_message_contacts_online()
+                    cliente_message_contacts_online();
                     break;
 
                 case 3:
                     // Precisa enviar o nome do cliente que está estabelecendo o contato
                     System.out.println("Buscando histórico...");
-                    cliente_retrive_history()
+                    cliente_retrive_history();
                     break;
 
                 case 4:
                     // Precisa de outro switch para perguntar qual o contato da comunicação.
                     System.out.println("Enviado mensagem offline...");
-                    cliente_message_contacts_offline()
+                    cliente_message_contacts_offline();
                     break;
 
                 case 5:
                     System.out.println("Acessando credênciais...");
-                    cliente_contact_info()
+                    cliente_contact_info();
                     break;
 
                 default:
@@ -65,7 +64,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + e.to_string());
+            System.out.println("Erro na comunicação: " + e.toString());
         }
     }
 
@@ -78,7 +77,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + e.to_string());
+            System.out.println("Erro na comunicação: " + e.toString());
         }
     }
 
@@ -91,7 +90,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + e.to_string());
+            System.out.println("Erro na comunicação: " + e.toString());
         }
     }
 
@@ -104,7 +103,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + e.to_string());
+            System.out.println("Erro na comunicação: " + e.toString());
         }
     }
 
@@ -117,7 +116,7 @@ public class Cliente {
             System.out.println(in.readLine());
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + e.to_string());
+            System.out.println("Erro na comunicação: " + e.toString());
         }
     }
 
