@@ -57,14 +57,23 @@ public class Cliente {
 	
     public static void cliente_retrive_contacts_online() {
         try {
+            // Montando corpo da requisição
+            Payload objPayload = new Payload("retrieveContactsOnline", "Teste");
+            String stringPayload = Payload.serializeHashMap(objPayload);
+            
+            // Enviando payload para o servidor
             PrintWriter out = new PrintWriter(Cliente.socket.getOutputStream(), true);
-            out.println("retrieve_contacts");
+            out.println(stringPayload);
 
+            // Ouvindo resposta
             BufferedReader in = new BufferedReader(new InputStreamReader(Cliente.socket.getInputStream()));
-            System.out.println(in.readLine());
+            String responseString = Payload.decodeBufferFromSocket(in);
+            Payload responseObj = Payload.deserializeHashMap(responseString);
+            
+            System.out.println(responseObj.get("response"));
         
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + e.toString());
+            System.out.println("1Erro na comunicação: " + e.toString());
         }
     }
 

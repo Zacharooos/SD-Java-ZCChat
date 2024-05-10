@@ -46,17 +46,41 @@ class ClientHandler extends Thread {
         try {
             // Recebe dados do cliente
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            System.out.println("S: Mensagem recebida do cliente " + clientSocket.getInetAddress() + ": " + in.readLine());
 
-            // TODO: Identificar solicitação
+            // Montando objeto do payload recebido
+            String requestString = Payload.decodeBufferFromSocket(in);
+            Payload receivedPayload = Payload.deserializeHashMap(requestString);
+            System.out.println("S: Mensagem recebida do cliente " + clientSocket.getInetAddress() + ": \n" + receivedPayload.get("func").toString());
+            
+            // Identificar solicitação
+            String functionRequested = receivedPayload.get("func").toString();
+            Object arguments = receivedPayload.get("args");
+            Payload responsePayload = null;
+            switch (functionRequested) {
+                case "retrieveContactsOnline":
+                    // TODO Tratar função com argumentos
+                    // TODO: Chamar controller com a função solicitada
+                    responsePayload = new Payload(functionRequested, arguments, "RESPOSTA");
+                    break;
 
-            // TODO: Chamar controller com a função solicitada
+                case "bolinha":
+                    // TODO Tratar função com argumentos
+                    // TODO: Chamar controller com a função solicitada
+                    break;
+            
+                default:
+                    responsePayload = new Payload(functionRequested, arguments, "404 NOT FOUND");
+                    break;
+            }
 
             // TODO: Retornar par ao cliente com o resultado da solicitação
 
+            // Montando string do payload da resposta
+            String responseString = Payload.serializeHashMap(responsePayload);
+
             // Envia dados de volta para o cliente
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            out.println("S: Olá, cliente!");
+            out.println(responseString);
 
             // Fecha a conexão com o cliente
             clientSocket.close();
