@@ -29,25 +29,33 @@ class MyHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         // Recebe o corpo da requisição
-        InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "UTF-8");
+        InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "ISO-8859-1");
         BufferedReader br = new BufferedReader(isr);
 
         // Recuperando objeto de payload
         String payloadString = Payload.decodeBufferFromSocket(br);
         Payload payloadObj = Payload.deserializeHashMap(payloadString);
-
-        // StringBuilder requestBody = new StringBuilder();
-        // String line;
-        // while ((line = br.readLine()) != null) {
-        //     requestBody.append(line);
-        // }
         br.close();
 
+        // Montando resposta para cliente
+        // TODO: Chamar alguma função do controller?
+        Payload responsePayload = new Payload((String) payloadObj.get("func"), payloadObj.get("args"), "RESPOSTA");
+        String response = Payload.serializeHashMap(responsePayload);
+
+        try {
+            Thread.sleep(5000); // Sleep por 5 segundos
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // Responde com um código de status 200 (OK) e o corpo da requisição recebido
-        String response = "Recebido: " + payloadObj.get("func");
+        exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=ISO-8859-1");
         exchange.sendResponseHeaders(200, response.length());
-        OutputStream os = exchange.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+        try (OutputStream outputStream = exchange.getResponseBody()) {
+            outputStream.write(response.getBytes());
+        }
+
+        // Fechar conexão
+        exchange.close();
     }
 }
