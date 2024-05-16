@@ -8,7 +8,48 @@ import java.util.Scanner;
 import java.net.URL;
 
 public class MyHttpClient {
+	public static void client_logon() {
+		Scanner scanner = new Scanner(System.in);
+        String login;
+        String password;
+        while(true){
+        
+        System.out.println("> ==== > Logon ZCChat < ==== <\n");
 
+            System.out.println(" > Login: ");
+            login = scanner.next();
+
+            System.out.println(" > Senha: ");
+            password = scanner.next();
+
+            // Debugging Apagar
+            System.out.println(login);    
+            System.out.println(password);
+            // Debugging Apagar
+
+            try {
+                // Montando corpo da requisição
+                Payload loginPaylodObj = new Payload("validade_login", login, password);
+                
+                // Enviando Payload e recebendo resposta
+                Payload responsePayloadObj = HttpConnect(loginPaylodObj);
+    
+                System.out.println(responsePayloadObj.get("response"));
+            
+                if (responsePayloadObj.get("response") == "ADRIANOOOO"){
+                    System.out.println("Eureka");
+                    break;
+                }
+
+            } catch (Exception e) {
+                System.out.println("Erro na comunicação: " + e.toString());
+            }
+
+        }
+        scanner.close();
+
+	}
+    
 	public static void client_menu() {
 		Scanner scanner = new Scanner(System.in);
         int menu_index = -1;
@@ -171,6 +212,7 @@ public class MyHttpClient {
     public static void main(String[] args) throws IOException {
 
         // TODO: Login
+        client_logon();
 
         // Inicializa Login
         client_menu();
