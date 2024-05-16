@@ -4,10 +4,12 @@ import java.util.UUID;
 public class Usuario {
     private final String id = UUID.randomUUID().toString().replace("-", "");
     private String username;
+    private String password;
     private int status; //Online = 1 // Ofline = 0
 
-    public Usuario(String username) {
+    public Usuario(String username, String password) {
         this.username = username;
+        this.password = password;
     }
 
     public String get_username(){
@@ -24,5 +26,18 @@ public class Usuario {
 
     public void turn_status(int state){
         this.status = state;
+    }
+
+    public boolean validadePassword(String input){
+        if(input.equals(password)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public void changePassword(String newPassword){
+        this.password = newPassword;
     }
 }
