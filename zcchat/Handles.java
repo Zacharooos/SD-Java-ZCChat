@@ -23,20 +23,26 @@ public class Handles {
             Payload payloadObj = Payload.deserializeHashMap(payloadString);
             br.close();
 
+            // Debugging, apagar:
+            System.out.println(payloadObj.get("func"));
+            System.out.println(payloadObj.get("args"));
+            System.out.println(payloadObj.get("response"));
+
+
             // Montando resposta para cliente
             // TODO: Chamar alguma função do controller?
-            Payload responsePayload = new Payload((String) payloadObj.get("func"), payloadObj.get("args"), "ADRIANOOOO");
+            Payload responsePayload = new Payload((String) payloadObj.get("func"), payloadObj.get("args"), payloadObj.get("func"));
             String response = Payload.serializeHashMap(responsePayload);
 
             // Responde com um código de status 200 (OK) e o corpo da requisição recebido
             exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=ISO-8859-1");
             exchange.sendResponseHeaders(200, response.getBytes().length);
             try (DataOutputStream outputStream = new DataOutputStream(exchange.getResponseBody())) {
-                System.out.println("aaa");
+                System.out.println("S: Processado");
                 outputStream.writeBytes(response);
                 outputStream.flush();
             }
-            System.out.println("bbb");
+            System.out.println("S: Falha");
             exchange.close();
         }
     }
