@@ -1,5 +1,7 @@
 package zcchat;
 
+import java.util.List;
+
 public class Utils {
     public static void ClearConsole() {
         try {
@@ -8,5 +10,10 @@ public class Utils {
             e.printStackTrace();
         }
     }
-    
+ 
+    public static void DisplayList(List<String> lista) {
+        for (String elemento : lista) {
+            System.out.println(elemento);
+        }
+    }
 }

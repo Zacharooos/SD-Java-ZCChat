@@ -17,10 +17,10 @@ public class MyHttpClient {
         System.out.println("> ==== > Logon ZCChat < ==== <\n");
 
             System.out.println(" > Login: ");
-            login = scanner.next();
+            login = scanner.nextLine();
 
             System.out.println(" > Senha: ");
-            password = scanner.next();
+            password = scanner.nextLine();
 
             // Debugging Apagar
             System.out.println(login);    
@@ -34,15 +34,17 @@ public class MyHttpClient {
                 // Enviando Payload e recebendo resposta
                 Payload responsePayloadObj = HttpConnect(loginPaylodObj);
     
-                System.out.println(responsePayloadObj.get("response"));
+                System.out.println(responsePayloadObj.get("response").toString());
             
-                if (responsePayloadObj.get("response") == "ADRIANOOOO"){
+                if (responsePayloadObj.get("response") == responsePayloadObj.get("response")){
                     System.out.println("Eureka");
+                    
                     break;
                 }
 
             } catch (Exception e) {
                 System.out.println("Erro na comunicação: " + e.toString());
+                scanner.close();
             }
 
         }
@@ -51,41 +53,60 @@ public class MyHttpClient {
 	}
     
 	public static void client_menu() {
-		Scanner scanner = new Scanner(System.in);
+		Scanner scanner_menu = new Scanner(System.in);
+        Scanner scanner_input = new Scanner(System.in);
+        
         int menu_index = -1;
+        String input1;
+        String input2;
 
         while(menu_index != 0){
             System.out.println("Oque você deseja fazer?\n * 1 - Procurar contatos online.\n * 2 - Falar com um contato online.\n * 3 - Visualizar historico.\n * 4 - Mensagem broadcast\n * 5 - Gerenciar conta\n Outra tecla para sair");
 
-            menu_index = scanner.nextInt();
+            menu_index = scanner_menu.nextInt();
 
             switch (menu_index) {
                 case 1:
+                    Utils.ClearConsole();
                     System.out.println("Procurando contatos...");
-                    cliente_retrive_contacts_online();
+                    ClienteRetrieveContactsOnline();
+                    // Utils.DisplayList();
+                    // Exibir lista de contatos Online
+
                     break;
 
                 case 2:
                     // Precisa de outro switch para perguntar qual o contato da comunicação.
+                    Utils.ClearConsole();
+                    
+                    System.out.println("Informe o nome do contato:");
+                    input1 = scanner_input.nextLine();
+
+                    System.out.println("Informe a sua mensagem:");
+                    input2 = scanner_input.nextLine();
+
                     System.out.println("Verificando se o contato está online...");
-                    cliente_message_contacts_online();
+                    ClienteMessageContactOnline(input1, input2);
+                    
                     break;
 
                 case 3:
-                    // Precisa enviar o nome do cliente que está estabelecendo o contato
+                    Utils.ClearConsole();
                     System.out.println("Buscando historico...");
-                    cliente_retrive_history();
+                    ClienteRetrieveHistory();
                     break;
 
                 case 4:
                     // Precisa de outro switch para perguntar qual o contato da comunicação.
-                    System.out.println("Enviado mensagem offline...");
-                    cliente_message_all_contacts();
+                    Utils.ClearConsole();
+                    System.out.println("Enviado mensagem broadcast");
+                    ClienteMessageAllContacts();
                     break;
 
                 case 5:
+                    Utils.ClearConsole();
                     System.out.println("Acessando credenciais...");
-                    cliente_contact_info();
+                    ClienteInfo();
                     break;
 
                 default:
@@ -95,10 +116,11 @@ public class MyHttpClient {
             }
         }
 
-            scanner.close();
+        scanner_input.close();
+        scanner_menu.close();
 	}
 	
-    public static void cliente_retrive_contacts_online() {
+    public static void ClienteRetrieveContactsOnline() {
         try {
             // Montando corpo da requisição
             Payload objPayload = new Payload("retrieveContactsOnline", "Teste");
@@ -107,16 +129,42 @@ public class MyHttpClient {
             Payload responsePayloadObj = HttpConnect(objPayload);
 
             System.out.println(responsePayloadObj.get("response"));
+            
         
         } catch (Exception e) {
             System.out.println("Erro na comunicação: " + e.toString());
         }
     }
 
-    public static void cliente_message_contacts_online() {
+    public static void ClienteMessageContactOnline(String nome, String msg) {
+        try {
+            // Montando corpo da requisição, passando nome e mensagem
+            Payload objPayload = new Payload("messageContactOnline", nome, msg);
+            
+            // Enviando Payload e recebendo resposta
+            Payload responsePayloadObj = HttpConnect(objPayload);
+
+            String response = responsePayloadObj.get("response").toString();
+            System.out.println(response);
+            
+            if (response == "UserNotFound"){
+                System.out.println("O usuario nao esta online no momento!");
+            
+            } else if (response == "ServerError"){
+                System.out.println("O houve algum erro durante o processamento, tente novamente!");
+            } else {
+                System.out.println("Eu -> " + nome + ": " + msg);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro na comunicação: " + e.toString());
+        }
+    }
+
+    public static void ClienteRetrieveHistory() {
         try {
             // Montando corpo da requisição
-            Payload objPayload = new Payload("cliente_message_contacts_online", "Teste");
+            Payload objPayload = new Payload("retrieveHistory", "Teste");
             
             // Enviando Payload e recebendo resposta
             Payload responsePayloadObj = HttpConnect(objPayload);
@@ -128,10 +176,10 @@ public class MyHttpClient {
         }
     }
 
-    public static void cliente_retrive_history() {
+    public static void ClienteMessageAllContacts() {
         try {
             // Montando corpo da requisição
-            Payload objPayload = new Payload("cliente_retrive_history", "Teste");
+            Payload objPayload = new Payload("messageAllContacts", "Teste");
             
             // Enviando Payload e recebendo resposta
             Payload responsePayloadObj = HttpConnect(objPayload);
@@ -143,25 +191,10 @@ public class MyHttpClient {
         }
     }
 
-    public static void cliente_message_all_contacts() {
+    public static void ClienteInfo() {
         try {
             // Montando corpo da requisição
-            Payload objPayload = new Payload("cliente_message_all_contacts", "Teste");
-            
-            // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload);
-
-            System.out.println(responsePayloadObj.get("response"));
-        
-        } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + e.toString());
-        }
-    }
-
-    public static void cliente_contact_info() {
-        try {
-            // Montando corpo da requisição
-            Payload objPayload = new Payload("cliente_contact_info", "Teste");
+            Payload objPayload = new Payload("clienteInfo", "Teste");
             
             // Enviando Payload e recebendo resposta
             Payload responsePayloadObj = HttpConnect(objPayload);
@@ -212,7 +245,7 @@ public class MyHttpClient {
     public static void main(String[] args) throws IOException {
 
         // TODO: Login
-        client_logon();
+        // client_logon();
 
         // Inicializa Login
         client_menu();
