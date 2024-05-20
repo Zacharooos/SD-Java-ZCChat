@@ -29,27 +29,26 @@ public class MyHttpClient {
 
             try {
                 // Montando corpo da requisição
-                Payload loginPaylodObj = new Payload("validade_login", login, password);
+                Payload loginPaylodObj = new Payload("newUser");
+                loginPaylodObj.put("username", login);
+                loginPaylodObj.put("password", password);
                 
                 // Enviando Payload e recebendo resposta
-                Payload responsePayloadObj = HttpConnect(loginPaylodObj);
+                Payload responsePayloadObj = HttpConnect(loginPaylodObj, "login");
     
-                System.out.println(responsePayloadObj.get("response").toString());
-            
-                if (responsePayloadObj.get("response") == responsePayloadObj.get("response")){
-                    System.out.println("Eureka");
-                    
+                if (responsePayloadObj.get("response").equals("OK")){
+                    System.out.println("LOGIN EFETUADO!!");
                     break;
                 }
+                System.out.println(responsePayloadObj.get("response").toString());
+
+                // TODO: Guardar o usuário que está logado!
 
             } catch (Exception e) {
                 System.out.println("Erro na comunicação: " + e.toString());
-                scanner.close();
             }
 
         }
-        scanner.close();
-
 	}
     
 	public static void client_menu() {
@@ -126,7 +125,7 @@ public class MyHttpClient {
             Payload objPayload = new Payload("retrieveContactsOnline", "Teste");
             
             // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload);
+            Payload responsePayloadObj = HttpConnect(objPayload, "");
 
             System.out.println(responsePayloadObj.get("response"));
             
@@ -139,10 +138,10 @@ public class MyHttpClient {
     public static void ClienteMessageContactOnline(String nome, String msg) {
         try {
             // Montando corpo da requisição, passando nome e mensagem
-            Payload objPayload = new Payload("messageContactOnline", nome, msg);
+            Payload objPayload = new Payload("cliente.nome"); // TODO: Montar peyload certa
             
             // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload);
+            Payload responsePayloadObj = HttpConnect(objPayload, "");
 
             String response = responsePayloadObj.get("response").toString();
             System.out.println(response);
@@ -167,7 +166,7 @@ public class MyHttpClient {
             Payload objPayload = new Payload("retrieveHistory", "Teste");
             
             // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload);
+            Payload responsePayloadObj = HttpConnect(objPayload, "");
 
             System.out.println(responsePayloadObj.get("response"));
         
@@ -182,7 +181,7 @@ public class MyHttpClient {
             Payload objPayload = new Payload("messageAllContacts", "Teste");
             
             // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload);
+            Payload responsePayloadObj = HttpConnect(objPayload, "");
 
             System.out.println(responsePayloadObj.get("response"));
         
@@ -197,7 +196,7 @@ public class MyHttpClient {
             Payload objPayload = new Payload("clienteInfo", "Teste");
             
             // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload);
+            Payload responsePayloadObj = HttpConnect(objPayload, "");
 
             System.out.println(responsePayloadObj.get("response"));
         
@@ -207,9 +206,9 @@ public class MyHttpClient {
     }
 
     @SuppressWarnings("deprecation")
-    public static Payload HttpConnect(Payload requestPayloadObj) throws IOException{
+    public static Payload HttpConnect(Payload requestPayloadObj, String route) throws IOException{
         // Configurando conexão
-        String url = "http://localhost:8000/";
+        String url = "http://localhost:8000/" + route;
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Content-Type", "text/plain; charset=ISO-8859-1");
@@ -229,13 +228,11 @@ public class MyHttpClient {
         "ISO-8859-1"))) {
             // Obtém o código de resposta HTTP
             int responseCode = connection.getResponseCode();
-            System.out.println("Response Code: " + responseCode);
 
             String responseString = Payload.decodeBufferFromSocket(br);
             Payload responsePayloadObj = Payload.deserializeHashMap(responseString);
          
             // Imprimir o corpo da resposta
-            System.err.println(responsePayloadObj.get("response"));
             connection.disconnect();
             return responsePayloadObj;
         }
@@ -245,7 +242,7 @@ public class MyHttpClient {
     public static void main(String[] args) throws IOException {
 
         // TODO: Login
-        // client_logon();
+        client_logon();
 
         // Inicializa Login
         client_menu();

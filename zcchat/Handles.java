@@ -10,106 +10,49 @@ import com.sun.net.httpserver.HttpHandler;
 public class Handles {
     // Classe que vai conter todas as subclasses de handles para as rotas
 
+    static private Payload recieveRequest(HttpExchange exchange) throws IOException{
+        // Recebe o corpo da requisição
+        InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "ISO-8859-1");
+        BufferedReader br = new BufferedReader(isr);
+
+        // Recuperando objeto de payload
+        String payloadString = Payload.decodeBufferFromSocket(br);
+        Payload payloadObj = Payload.deserializeHashMap(payloadString);
+        br.close();
+
+        return payloadObj;
+    }
+
+    static private void sendResponse(HttpExchange exchange, Payload responsePayload) throws IOException{
+        String response = Payload.serializeHashMap(responsePayload);
+
+        // Responde com um código de status 200 (OK) e o corpo da requisição recebido
+        exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=ISO-8859-1");
+        exchange.sendResponseHeaders(200, response.getBytes().length);
+        try (DataOutputStream outputStream = new DataOutputStream(exchange.getResponseBody())) {
+            System.out.println("S: Processado");
+            outputStream.writeBytes(response);
+            outputStream.flush();
+        }
+        System.out.println("S: Falha");
+        exchange.close();
+    }
+
     // Handle de exemplo
     static class SampleHandler implements HttpHandler {
     @Override
         public void handle(HttpExchange exchange) throws IOException {
             // Recebe o corpo da requisição
-            InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "ISO-8859-1");
-            BufferedReader br = new BufferedReader(isr);
-
-            // Recuperando objeto de payload
-            String payloadString = Payload.decodeBufferFromSocket(br);
-            Payload payloadObj = Payload.deserializeHashMap(payloadString);
-            br.close();
+            Payload payloadObj = recieveRequest(exchange);
 
             // Debugging, apagar:
-            System.out.println(payloadObj.get("func"));
-            System.out.println(payloadObj.get("args"));
-            System.out.println(payloadObj.get("response"));
-
+            System.out.println(payloadObj.get("author"));
 
             // Montando resposta para cliente
-            // TODO: Chamar alguma função do controller?
-            Payload responsePayload = new Payload((String) payloadObj.get("func"), payloadObj.get("args"), payloadObj.get("func"));
-            String response = Payload.serializeHashMap(responsePayload);
+            Payload responsePayload = new Payload("SERVER", "SUCCESS");
 
             // Responde com um código de status 200 (OK) e o corpo da requisição recebido
-            exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=ISO-8859-1");
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            try (DataOutputStream outputStream = new DataOutputStream(exchange.getResponseBody())) {
-                System.out.println("S: Processado");
-                outputStream.writeBytes(response);
-                outputStream.flush();
-            }
-            System.out.println("S: Falha");
-            exchange.close();
-        }
-    }
-
-    // Handle de para login do cliente
-    static class LoginHandler implements HttpHandler {
-    @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            // Recebe o corpo da requisição
-            InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "ISO-8859-1");
-            BufferedReader br = new BufferedReader(isr);
-
-            // Recuperando objeto de payload
-            String payloadString = Payload.decodeBufferFromSocket(br);
-            Payload payloadObj = Payload.deserializeHashMap(payloadString);
-            br.close();
-
-            // Montando resposta para cliente
-            // TODO: Chamar alguma função do controller?
-            Payload responsePayload = new Payload((String) payloadObj.get("func"), payloadObj.get("args"), "OK");
-            String response = Payload.serializeHashMap(responsePayload);
-
-            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
-            exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=ISO-8859-1");
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            try (DataOutputStream outputStream = new DataOutputStream(exchange.getResponseBody())) {
-                System.out.println("aaa");
-                outputStream.writeBytes(response);
-                outputStream.flush();
-            }
-            System.out.println("bbb");
-            exchange.close();
-
-            // Iniciando sistema de ping para o cliente
-        }
-    }
-
-    // Handle para recepção de ping do cliente
-    static class PingHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            // Recebe o corpo da requisição
-            InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "ISO-8859-1");
-            BufferedReader br = new BufferedReader(isr);
-
-            // Recuperando objeto de payload
-            String payloadString = Payload.decodeBufferFromSocket(br);
-            Payload payloadObj = Payload.deserializeHashMap(payloadString);
-            br.close();
-
-            // Montando resposta para cliente
-            // TODO: Chamar alguma função do controller?
-            Payload responsePayload = new Payload((String) payloadObj.get("func"), payloadObj.get("args"), "OK");
-            String response = Payload.serializeHashMap(responsePayload);
-
-            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
-            exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=ISO-8859-1");
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            try (DataOutputStream outputStream = new DataOutputStream(exchange.getResponseBody())) {
-                System.out.println("aaa");
-                outputStream.writeBytes(response);
-                outputStream.flush();
-            }
-            System.out.println("bbb");
-            exchange.close();
-
-            // Iniciando sistema de ping para o cliente
+            sendResponse(exchange, responsePayload);
         }
     }
 
@@ -118,31 +61,46 @@ public class Handles {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             // Recebe o corpo da requisição
-            InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "ISO-8859-1");
-            BufferedReader br = new BufferedReader(isr);
+            Payload payloadObj = recieveRequest(exchange);
 
-            // Recuperando objeto de payload
-            String payloadString = Payload.decodeBufferFromSocket(br);
-            Payload payloadObj = Payload.deserializeHashMap(payloadString);
-            br.close();
+            // Obtendo valores do payload
+            String username = (String) payloadObj.get("username");
+            String password = (String) payloadObj.get("password");
+
+            // Salvando no controller
+            Controller controller = Controller.getController();
+            controller.addUser(username, password);
 
             // Montando resposta para cliente
-            // TODO: Chamar alguma função do controller?
-            Payload responsePayload = new Payload((String) payloadObj.get("func"), payloadObj.get("args"), "OK");
-            String response = Payload.serializeHashMap(responsePayload);
+            Payload responsePayload = new Payload("SERVER", "SUCCESS");
 
             // Responde com um código de status 200 (OK) e o corpo da requisição recebido
-            exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=ISO-8859-1");
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            try (DataOutputStream outputStream = new DataOutputStream(exchange.getResponseBody())) {
-                System.out.println("aaa");
-                outputStream.writeBytes(response);
-                outputStream.flush();
-            }
-            System.out.println("bbb");
-            exchange.close();
+            sendResponse(exchange, responsePayload);
+        }
+    }
 
-            // Iniciando sistema de ping para o cliente
+    // Handle para login de usuario
+    static class LoginHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Recebe o corpo da requisição
+            Payload payloadObj = recieveRequest(exchange);
+
+            // Obtendo valores do payload
+            String username = (String) payloadObj.get("username");
+            String password = (String) payloadObj.get("password");
+
+            // Salvando no controller
+            Controller controller = Controller.getController();
+            String ret = controller.loginUser(username, password);
+            
+            // Montando resposta para cliente
+            Payload responsePayload = new Payload("SERVER", ret);
+
+            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
+            sendResponse(exchange, responsePayload);
+
+            // TODO: Chamar função de ouvir o ping (tira o user do userOnline caso nao seja pingado)
         }
     }
 }

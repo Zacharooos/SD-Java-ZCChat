@@ -8,8 +8,8 @@ import persistence.Serializer;
 public class Controller implements Serializable {
     private static Controller instance;
 
-    Map<String, Usuario> users;
-    Map<String, Usuario> onlineUsers;
+    private Map<String, Usuario> users;
+    private Map<String, Usuario> onlineUsers;
 
     private Controller(){
         users = new TreeMap<>();
@@ -17,8 +17,20 @@ public class Controller implements Serializable {
     }
 
     public void addUser(String username, String password){
-        users.put(username, new Usuario(username, password));
+        instance.users.put(username, new Usuario(username, password));
         Controller.save();
+    }
+
+    public String loginUser(String username, String password){
+        Usuario user = instance.users.get(username);
+        if (user == null) {
+            return "USER NOT FOUND";
+        }
+        if (!user.validatePassword(password)){
+            return "SENHA INCORRETA";
+        }
+        onlineUsers.put(username, null);
+        return "OK";
     }
 
     // Funções de persistence
@@ -31,5 +43,9 @@ public class Controller implements Serializable {
 
     public static void save() {
         Serializer.writeFile(instance);
+    }
+
+    public static Controller getController(){
+        return instance;
     }
 }

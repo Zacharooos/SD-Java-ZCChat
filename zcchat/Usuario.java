@@ -28,7 +28,7 @@ public class Usuario {
         this.status = state;
     }
 
-    public boolean validadePassword(String input){
+    public boolean validatePassword(String input){
         if(input.equals(password)){
             return true;
         }

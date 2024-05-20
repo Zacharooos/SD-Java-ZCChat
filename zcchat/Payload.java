@@ -9,17 +9,15 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 public class Payload extends HashMap<String, Object> {
-    public Payload(String func, Object args) {
+    public Payload(String author) {
         super();
-        this.put("func", func);
-        this.put("args", args);
+        this.put("author", author);
         this.put("response", "NULL");
     }
 
-    public Payload(String func, Object args, Object response) {
+    public Payload(String author, Object response) {
         super();
-        this.put("func", func);
-        this.put("args", args);
+        this.put("author", author);
         this.put("response", response);
     }
 

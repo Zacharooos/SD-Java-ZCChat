@@ -14,6 +14,8 @@ public class MyHttpServer {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
         server.createContext("/", new Handles.SampleHandler());
+        server.createContext("/createUser", new Handles.CreateAccountHandler());
+        server.createContext("/login", new Handles.LoginHandler());
         server.setExecutor(null);
         server.start();
 
