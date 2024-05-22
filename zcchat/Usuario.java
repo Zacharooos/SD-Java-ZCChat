@@ -1,7 +1,8 @@
 package zcchat;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Usuario {
+public class Usuario implements Serializable{
     private final String id = UUID.randomUUID().toString().replace("-", "");
     private String username;
     private String password;
