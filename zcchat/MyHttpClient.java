@@ -8,10 +8,54 @@ import java.util.Scanner;
 import java.net.URL;
 
 public class MyHttpClient {
-	public static void client_logon() {
-		Scanner scanner = new Scanner(System.in);
+
+	public static void client_singup() {
+        Scanner scanner = new Scanner(System.in);
         String login;
         String password;
+
+        Utils.ClearConsole();
+        
+        while(true){
+        
+        System.out.println("> ==== > SingUp ZCChat < ==== <\n");
+
+            System.out.println(" > Novo Login: ");
+            login = scanner.nextLine();
+
+            System.out.println(" > Nova Senha: ");
+            password = scanner.nextLine();
+
+            try {
+                // Montando corpo da requisição
+                Payload loginPaylodObj = new Payload(login);
+                loginPaylodObj.put("username", login);
+                loginPaylodObj.put("password", password);
+                
+                // Enviando Payload e recebendo resposta
+                Payload responsePayloadObj = HttpConnect(loginPaylodObj, "createUser");
+    
+                if (responsePayloadObj.get("response").equals("OK")){
+                    System.out.println("CADASTRO EFETUADO!! ... \n -> Redirecionando para LOGIN");
+                    break;
+                }
+                System.out.println(responsePayloadObj.get("response").toString());
+
+
+            } catch (Exception e) {
+                System.out.println("Erro na comunicação: " + e.toString());
+            }
+
+        }
+	}
+
+	public static void client_logon() {
+        Scanner scanner = new Scanner(System.in);
+        String login;
+        String password;
+
+        Utils.ClearConsole();
+
         while(true){
         
         System.out.println("> ==== > Logon ZCChat < ==== <\n");
@@ -52,9 +96,7 @@ public class MyHttpClient {
 	}
     
 	public static void client_menu() {
-		Scanner scanner_menu = new Scanner(System.in);
-        Scanner scanner_input = new Scanner(System.in);
-        
+        Scanner scanner = new Scanner(System.in);
         int menu_index = -1;
         String input1;
         String input2;
@@ -62,7 +104,7 @@ public class MyHttpClient {
         while(menu_index != 0){
             System.out.println("Oque você deseja fazer?\n * 1 - Procurar contatos online.\n * 2 - Falar com um contato online.\n * 3 - Visualizar historico.\n * 4 - Mensagem broadcast\n * 5 - Gerenciar conta\n Outra tecla para sair");
 
-            menu_index = scanner_menu.nextInt();
+            menu_index = scanner.nextInt();
 
             switch (menu_index) {
                 case 1:
@@ -79,10 +121,10 @@ public class MyHttpClient {
                     Utils.ClearConsole();
                     
                     System.out.println("Informe o nome do contato:");
-                    input1 = scanner_input.nextLine();
+                    input1 = scanner.nextLine();
 
                     System.out.println("Informe a sua mensagem:");
-                    input2 = scanner_input.nextLine();
+                    input2 = scanner.nextLine();
 
                     System.out.println("Verificando se o contato está online...");
                     ClienteMessageContactOnline(input1, input2);
@@ -114,9 +156,6 @@ public class MyHttpClient {
                     break;
             }
         }
-
-        scanner_input.close();
-        scanner_menu.close();
 	}
 	
     public static void ClienteRetrieveContactsOnline() {
@@ -227,7 +266,7 @@ public class MyHttpClient {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(),
         "ISO-8859-1"))) {
             // Obtém o código de resposta HTTP
-            int responseCode = connection.getResponseCode();
+            // int responseCode = connection.getResponseCode();
 
             String responseString = Payload.decodeBufferFromSocket(br);
             Payload responsePayloadObj = Payload.deserializeHashMap(responseString);
@@ -241,12 +280,25 @@ public class MyHttpClient {
 
     public static void main(String[] args) throws IOException {
 
-        // TODO: Login
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("> ==== > ZCChat < ==== <\n\nSeja bem-vindo, selecione uma opcao:\n 1 - Realizar login\n 2 - Criar login\nOutro - Sair");
+        int input = scanner.nextInt();
+
+        if (input > 2 || input < 1) {
+            System.out.println("Saindo...");
+            scanner.close();
+            return;
+        } else if (input == 2){
+            client_singup();
+        }
+
         client_logon();
 
         // Inicializa Login
         client_menu();
 
+        scanner.close();
 
     }
 }
