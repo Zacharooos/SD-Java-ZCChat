@@ -36,8 +36,43 @@ public class Controller implements Serializable {
             return "SENHA INCORRETA";
         }
         onlineUsers.put(username, null);
+        user.turnStatus(1);
+        user.ping();
         return "OK";
     }
+
+    public void logoutUser(String username){
+        Usuario user = instance.onlineUsers.get(username);
+        user.turnStatus(0);
+        instance.onlineUsers.remove(username);
+        return;
+    }
+
+    public void pingListener(String username) throws InterruptedException{
+        Usuario user = instance.onlineUsers.get(username);
+        if(user == null){
+            return;
+        }
+
+        while (true) {
+            if (!user.checkLastPing()) {
+                System.out.println("User " + username + "desconectado\n");
+                instance.logoutUser(username);
+                return;
+            }
+            Thread.sleep(30000);
+        }
+    }
+
+    public String pingUser(String username){
+        Usuario user = instance.onlineUsers.get(username);
+        if(user == null){
+            return "SESSAO EXPIRADA";
+        }
+        user.ping();
+        return "OK";
+    }
+
 
     // Funções de persistence
     public static void load(){

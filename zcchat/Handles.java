@@ -100,7 +100,57 @@ public class Handles {
             // Responde com um código de status 200 (OK) e o corpo da requisição recebido
             sendResponse(exchange, responsePayload);
 
-            // TODO: Chamar função de ouvir o ping (tira o user do userOnline caso nao seja pingado)
+            // Iniciando loop que ouvirá pings desse cliente
+            try{
+                controller.pingListener(username);
+            }catch(InterruptedException err){
+                System.out.println("Erro no PingListener do user " + username + "\n");
+
+            }
+        }
+    }
+
+    // Handle para ping de usuario
+    static class PingHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Recebe o corpo da requisição
+            Payload payloadObj = recieveRequest(exchange);
+
+            // Obtendo valores do payload
+            String username = (String) payloadObj.get("username");
+
+            // Fazemdp ping pelo controller
+            Controller controller = Controller.getController();
+            String ret = controller.pingUser(username);
+
+            // Montando resposta para cliente
+            Payload responsePayload = new Payload("SERVER", ret);
+
+            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
+            sendResponse(exchange, responsePayload);
+        }
+    }
+
+    // Handle para logout de usuario
+    static class LogoutHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Recebe o corpo da requisição
+            Payload payloadObj = recieveRequest(exchange);
+
+            // Obtendo valores do payload
+            String username = (String) payloadObj.get("username");
+
+            // Fazemdp ping pelo controller
+            Controller controller = Controller.getController();
+            controller.logoutUser(username);
+
+            // Montando resposta para cliente
+            Payload responsePayload = new Payload("SERVER", "OK");
+
+            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
+            sendResponse(exchange, responsePayload);
         }
     }
 }

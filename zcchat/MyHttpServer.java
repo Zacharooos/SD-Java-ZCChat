@@ -16,6 +16,8 @@ public class MyHttpServer {
         server.createContext("/", new Handles.SampleHandler());
         server.createContext("/createUser", new Handles.CreateAccountHandler());
         server.createContext("/login", new Handles.LoginHandler());
+        server.createContext("/logout", new Handles.LogoutHandler());
+        server.createContext("/ping", new Handles.PingHandler());
         server.setExecutor(null);
         server.start();
 
