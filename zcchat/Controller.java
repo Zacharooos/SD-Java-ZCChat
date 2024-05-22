@@ -16,9 +16,15 @@ public class Controller implements Serializable {
         onlineUsers = new TreeMap<>();
     }
 
-    public void addUser(String username, String password){
+    public String addUser(String username, String password){
+        // Verificando se user ja existe
+        Usuario existente = instance.users.get(username);
+        if (existente != null) {
+            return "USERNAME JA EXISTENTE";
+        }
         instance.users.put(username, new Usuario(username, password));
         Controller.save();
+        return "OK";
     }
 
     public String loginUser(String username, String password){

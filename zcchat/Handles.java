@@ -69,10 +69,10 @@ public class Handles {
 
             // Salvando no controller
             Controller controller = Controller.getController();
-            controller.addUser(username, password);
+            String ret = controller.addUser(username, password);
 
             // Montando resposta para cliente
-            Payload responsePayload = new Payload("SERVER", "SUCCESS");
+            Payload responsePayload = new Payload("SERVER", ret);
 
             // Responde com um código de status 200 (OK) e o corpo da requisição recebido
             sendResponse(exchange, responsePayload);
