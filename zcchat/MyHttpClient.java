@@ -9,9 +9,13 @@ import java.net.URL;
 
 public class MyHttpClient {
 
-	public static void client_singup(Scanner scanner) {
+	public static void client_singup() {
+        Scanner scanner = new Scanner(System.in);
         String login;
         String password;
+
+        Utils.ClearConsole();
+        
         while(true){
         
         System.out.println("> ==== > SingUp ZCChat < ==== <\n");
@@ -22,14 +26,9 @@ public class MyHttpClient {
             System.out.println(" > Nova Senha: ");
             password = scanner.nextLine();
 
-            // Debugging Apagar
-            System.out.println(login);    
-            System.out.println(password);
-            // Debugging Apagar
-
             try {
                 // Montando corpo da requisição
-                Payload loginPaylodObj = new Payload("newUser");
+                Payload loginPaylodObj = new Payload(login);
                 loginPaylodObj.put("username", login);
                 loginPaylodObj.put("password", password);
                 
@@ -50,9 +49,13 @@ public class MyHttpClient {
         }
 	}
 
-	public static void client_logon(Scanner scanner) {
+	public static void client_logon() {
+        Scanner scanner = new Scanner(System.in);
         String login;
         String password;
+
+        Utils.ClearConsole();
+
         while(true){
         
         System.out.println("> ==== > Logon ZCChat < ==== <\n");
@@ -92,7 +95,8 @@ public class MyHttpClient {
         }
 	}
     
-	public static void client_menu(Scanner scanner) {
+	public static void client_menu() {
+        Scanner scanner = new Scanner(System.in);
         int menu_index = -1;
         String input1;
         String input2;
@@ -281,17 +285,18 @@ public class MyHttpClient {
         System.out.println("> ==== > ZCChat < ==== <\n\nSeja bem-vindo, selecione uma opcao:\n 1 - Realizar login\n 2 - Criar login\nOutro - Sair");
         int input = scanner.nextInt();
 
-        if (input > 2 && input < 1) {
+        if (input > 2 || input < 1) {
             System.out.println("Saindo...");
             scanner.close();
+            return;
         } else if (input == 2){
-            client_singup(scanner);
+            client_singup();
         }
 
-        client_logon(scanner);
+        client_logon();
 
         // Inicializa Login
-        client_menu(scanner);
+        client_menu();
 
         scanner.close();
 
