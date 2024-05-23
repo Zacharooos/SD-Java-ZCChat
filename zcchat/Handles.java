@@ -97,16 +97,14 @@ public class Handles {
             // Montando resposta para cliente
             Payload responsePayload = new Payload("SERVER", ret);
 
+            // Iniciando loop que ouvirá pings desse cliente
+            if (ret.equals("OK")) {
+                controller.pingListener(username);
+            }
+
             // Responde com um código de status 200 (OK) e o corpo da requisição recebido
             sendResponse(exchange, responsePayload);
 
-            // Iniciando loop que ouvirá pings desse cliente
-            try{
-                controller.pingListener(username);
-            }catch(InterruptedException err){
-                System.out.println("Erro no PingListener do user " + username + "\n");
-
-            }
         }
     }
 

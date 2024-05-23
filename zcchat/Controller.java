@@ -35,7 +35,7 @@ public class Controller implements Serializable {
         if (!user.validatePassword(password)){
             return "SENHA INCORRETA";
         }
-        onlineUsers.put(username, null);
+        instance.onlineUsers.put(username, user);
         user.turnStatus(1);
         user.ping();
         return "OK";
@@ -48,20 +48,36 @@ public class Controller implements Serializable {
         return;
     }
 
-    public void pingListener(String username) throws InterruptedException{
+    public void pingListener(String username){
         Usuario user = instance.onlineUsers.get(username);
         if(user == null){
             return;
         }
 
-        while (true) {
-            if (!user.checkLastPing()) {
-                System.out.println("User " + username + "desconectado\n");
-                instance.logoutUser(username);
-                return;
+        // Criando thread de verificação
+        class PingListener extends Thread{
+            public void run(){
+                while (true) {
+                    try{
+                        System.out.println("checking... " + username + "\n");
+                        if (!user.checkLastPing()) {
+                            System.out.println("User " + username + " desconectado\n");
+                            instance.logoutUser(username);
+                            return;
+                        }
+                        Thread.sleep(30000);
+                    }catch(InterruptedException err){
+                        System.out.println("Erro no PingListener do user " + username + "\n");
+                    }
+                }
             }
-            Thread.sleep(30000);
         }
+
+        // Iniciando thread de verificação
+        PingListener thread = new PingListener();
+        thread.start();
+
+        return;
     }
 
     public String pingUser(String username){
