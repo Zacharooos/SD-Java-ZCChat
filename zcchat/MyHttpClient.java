@@ -57,7 +57,6 @@ public class MyHttpClient {
 	}
 
 	public static Usuario client_logon() {
-        Scanner scanner = new Scanner(System.in);
         String login;
         String password;
 
@@ -135,6 +134,74 @@ public class MyHttpClient {
         return cliente;
 	}
     
+	public static void gerencia_menu(Usuario cliente) {
+        int menu_index = -1;
+        String input1;
+
+        System.out.println("\nUsuario: " + cliente.get_username());
+        System.out.println("Status: " + cliente.get_status());
+        System.out.println("Id: " + cliente.get_id() + "\n");
+
+
+        while(menu_index != 0){
+            System.out.println("Oque você deseja fazer?\n * 1 - Trocar senha.\n * 2 - Apagar historico.\n * 3 - Apagar conta.\n Outra tecla para sair");
+
+            menu_index = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (menu_index) {
+                case 1:
+                    Utils.ClearConsole();
+                    System.out.println("Trocando senha...");
+                    System.out.println("Tem certeza que deseja trocar a senha?\n 1 - Nao\n 2 - Sim\n");
+                    input1 = scanner.nextLine();
+                    
+                    if (!input1.equals("2")) {break;}
+                    
+                    System.out.println("    > Nova senha:\n");
+                    input1 = scanner.nextLine();
+
+                    // Payload da troca de senha
+
+                    cliente.changePassword(input1);
+
+                    System.out.println("Troca de senha concluida com sucesso!...");
+
+                    break;
+
+                case 2:
+                    // Precisa de outro switch para perguntar qual o contato da comunicação.
+                    Utils.ClearConsole();
+                    
+                    System.out.println("Tem certeza que deseja APAGAR o HISTORICO (Irreversivel)?\n 1 - Nao\n 2 - Sim\n");
+                    input1 = scanner.nextLine();
+                    
+                    if (!input1.equals("2")) {break;}
+                    
+                    History.removeHistory(cliente);
+
+                    System.out.println("Historico apagado com sucesso");
+                    
+                    break;
+
+                case 3:
+                    Utils.ClearConsole();
+                    
+                    System.out.println("Tem certeza que deseja APAGAR a conta (Irreversivel)?\n 1 - Nao\n 2 - Sim\n");
+                    input1 = scanner.nextLine();
+                    
+                    if (!input1.equals("2")) {break;}
+
+                    //c Remover conta
+
+                default:
+                    System.out.println("Saindo");
+                    menu_index = 0;
+                    break;
+            }
+        }
+	}
+
 	public static void client_menu(Usuario cliente) {
         int menu_index = -1;
         String input1;
@@ -185,8 +252,8 @@ public class MyHttpClient {
 
                 case 5:
                     Utils.ClearConsole();
-                    System.out.println("Acessando credenciais...");
-                    ClienteInfo();
+                    System.out.println("Acessando informacoes da conta...");
+                    ClienteInfo(cliente);
                     break;
 
                 default:
@@ -215,10 +282,13 @@ public class MyHttpClient {
 
     public static void ClienteMessageContactOnline(Usuario cliente, String name, String msg) {
         try {
+            
+            // Precisa fazer um get_User com o servidor, usando si proprio por enquanto
+            Mensagem mensagem = new Mensagem(msg, cliente, cliente);
+            
             // Montando corpo da requisição, passando nome e mensagem
-            Payload objPayload = new Payload(cliente.get_username()); // TODO: Montar payload certa
-            objPayload.put("name", name);
-            objPayload.put("msg", msg);
+            Payload objPayload = new Payload(cliente.get_username()); // TODO: Montar peyload certa
+            objPayload.put("mensagem", mensagem.get_text());
             
             // Enviando Payload e recebendo resposta
             Payload responsePayloadObj = HttpConnect(objPayload, "");
@@ -232,9 +302,9 @@ public class MyHttpClient {
             } else if (response == "ServerError"){
                 System.out.println("O houve algum erro durante o processamento, tente novamente!");
             } else {
-                String log = "Eu -> " + name + ": " + msg;
+                String log = "[" + mensagem.get_timestamp().toString() + "] Eu -> " + mensagem.get_destinatario().get_username() + ": " + mensagem.get_text();
                 System.out.println(log);
-                History.writeHistory(cliente, log);
+                History.writeHistory(mensagem, log);
             }
 
         } catch (Exception e) {
@@ -276,19 +346,10 @@ public class MyHttpClient {
         }
     }
 
-    public static void ClienteInfo() {
-        try {
-            // Montando corpo da requisição
-            Payload objPayload = new Payload("clienteInfo", "Teste");
-            
-            // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload, "");
+    public static void ClienteInfo(Usuario cliente) {
 
-            System.out.println(responsePayloadObj.get("response"));
-        
-        } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + e.toString());
-        }
+        // Tem um menu proprio
+        gerencia_menu(cliente);
     }
 
     @SuppressWarnings("deprecation")
