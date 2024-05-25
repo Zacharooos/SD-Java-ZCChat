@@ -94,17 +94,43 @@ public class MyHttpClient {
                     break;
                 }
                 System.out.println(responsePayloadObj.get("response").toString());
-
-                // TODO: Guardar o usuário que está logado!
-                
                 
             } catch (Exception e) {
                 System.out.println("Erro na comunicação: " + e.toString());
             }    
         }
+
+        // Iniciando thread de ping para servidor
+        class PingThread extends Thread {
+            private String username;
+
+            public PingThread(String username){
+                this.username = username;
+            }
+
+            public void run() {
+                Payload pingPayload = new Payload(username);
+                while (true) {
+                    try {
+                        System.out.println("Pingando servidor");
+                        HttpConnect(pingPayload, "ping");
+                        Thread.sleep(30000);
+                    } catch (Exception err) {
+                        err.printStackTrace();
+                        System.out.println("Erro ao realizar ping. Conexao com servidor interrompida!");
+                    }
+
+                }
+            }
+        }
+
+        PingThread pingThread = new PingThread(login);
+        pingThread.setDaemon(true);
+        pingThread.start();
         
         // TODO: Guardar o usuário que está logado!
         // Temporariamente criando um cliente novo para teste
+        // Recomendo guardar pela string do username - CJ
         Usuario cliente = new Usuario(login, password);
         return cliente;
 	}
@@ -190,7 +216,7 @@ public class MyHttpClient {
     public static void ClienteMessageContactOnline(Usuario cliente, String name, String msg) {
         try {
             // Montando corpo da requisição, passando nome e mensagem
-            Payload objPayload = new Payload(cliente.get_username()); // TODO: Montar peyload certa
+            Payload objPayload = new Payload(cliente.get_username()); // TODO: Montar payload certa
             objPayload.put("name", name);
             objPayload.put("msg", msg);
             
@@ -308,7 +334,7 @@ public class MyHttpClient {
         if (input > 2 || input < 1) {
             System.out.println("Saindo...");
             scanner.close();
-            return;
+            System.exit(0);
         } else if (input == 2){
             client_singup();
         }

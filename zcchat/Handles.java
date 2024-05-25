@@ -30,7 +30,7 @@ public class Handles {
         exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=ISO-8859-1");
         exchange.sendResponseHeaders(200, response.getBytes().length);
         try (DataOutputStream outputStream = new DataOutputStream(exchange.getResponseBody())) {
-            System.out.println("S: Processado");
+            // System.out.println("S: Processado");
             outputStream.writeBytes(response);
             outputStream.flush();
         }
@@ -116,7 +116,7 @@ public class Handles {
             Payload payloadObj = recieveRequest(exchange);
 
             // Obtendo valores do payload
-            String username = (String) payloadObj.get("username");
+            String username = (String) payloadObj.get("author");
 
             // Fazemdp ping pelo controller
             Controller controller = Controller.getController();
