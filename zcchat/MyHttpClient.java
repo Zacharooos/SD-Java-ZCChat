@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.Scanner;
+
+import persistence.History;
+
 import java.net.URL;
 
 public class MyHttpClient {
+    private static Scanner scanner = new Scanner(System.in);
 
 	public static void client_singup() {
-        Scanner scanner = new Scanner(System.in);
         String login;
         String password;
 
@@ -26,6 +29,10 @@ public class MyHttpClient {
             System.out.println(" > Nova Senha: ");
             password = scanner.nextLine();
 
+            scanner.reset();
+
+            Utils.ClearConsole();
+            
             try {
                 // Montando corpo da requisição
                 Payload loginPaylodObj = new Payload(login);
@@ -49,7 +56,7 @@ public class MyHttpClient {
         }
 	}
 
-	public static void client_logon() {
+	public static Usuario client_logon() {
         Scanner scanner = new Scanner(System.in);
         String login;
         String password;
@@ -71,6 +78,8 @@ public class MyHttpClient {
             System.out.println(password);
             // Debugging Apagar
 
+            Utils.ClearConsole();
+
             try {
                 // Montando corpo da requisição
                 Payload loginPaylodObj = new Payload("newUser");
@@ -87,16 +96,20 @@ public class MyHttpClient {
                 System.out.println(responsePayloadObj.get("response").toString());
 
                 // TODO: Guardar o usuário que está logado!
-
+                
+                
             } catch (Exception e) {
                 System.out.println("Erro na comunicação: " + e.toString());
-            }
-
+            }    
         }
+        
+        // TODO: Guardar o usuário que está logado!
+        // Temporariamente criando um cliente novo para teste
+        Usuario cliente = new Usuario(login, password);
+        return cliente;
 	}
     
-	public static void client_menu() {
-        Scanner scanner = new Scanner(System.in);
+	public static void client_menu(Usuario cliente) {
         int menu_index = -1;
         String input1;
         String input2;
@@ -105,6 +118,7 @@ public class MyHttpClient {
             System.out.println("Oque você deseja fazer?\n * 1 - Procurar contatos online.\n * 2 - Falar com um contato online.\n * 3 - Visualizar historico.\n * 4 - Mensagem broadcast\n * 5 - Gerenciar conta\n Outra tecla para sair");
 
             menu_index = scanner.nextInt();
+            scanner.nextLine();
 
             switch (menu_index) {
                 case 1:
@@ -127,18 +141,17 @@ public class MyHttpClient {
                     input2 = scanner.nextLine();
 
                     System.out.println("Verificando se o contato está online...");
-                    ClienteMessageContactOnline(input1, input2);
+                    ClienteMessageContactOnline(cliente, input1, input2);
                     
                     break;
 
                 case 3:
                     Utils.ClearConsole();
                     System.out.println("Buscando historico...");
-                    ClienteRetrieveHistory();
+                    ClienteRetrieveHistory(cliente);
                     break;
 
                 case 4:
-                    // Precisa de outro switch para perguntar qual o contato da comunicação.
                     Utils.ClearConsole();
                     System.out.println("Enviado mensagem broadcast");
                     ClienteMessageAllContacts();
@@ -174,10 +187,12 @@ public class MyHttpClient {
         }
     }
 
-    public static void ClienteMessageContactOnline(String nome, String msg) {
+    public static void ClienteMessageContactOnline(Usuario cliente, String name, String msg) {
         try {
             // Montando corpo da requisição, passando nome e mensagem
-            Payload objPayload = new Payload("cliente.nome"); // TODO: Montar peyload certa
+            Payload objPayload = new Payload(cliente.get_username()); // TODO: Montar peyload certa
+            objPayload.put("name", name);
+            objPayload.put("msg", msg);
             
             // Enviando Payload e recebendo resposta
             Payload responsePayloadObj = HttpConnect(objPayload, "");
@@ -191,7 +206,9 @@ public class MyHttpClient {
             } else if (response == "ServerError"){
                 System.out.println("O houve algum erro durante o processamento, tente novamente!");
             } else {
-                System.out.println("Eu -> " + nome + ": " + msg);
+                String log = "Eu -> " + name + ": " + msg;
+                System.out.println(log);
+                History.writeHistory(cliente, log);
             }
 
         } catch (Exception e) {
@@ -199,7 +216,7 @@ public class MyHttpClient {
         }
     }
 
-    public static void ClienteRetrieveHistory() {
+    public static void ClienteRetrieveHistory(Usuario cliente) {
         try {
             // Montando corpo da requisição
             Payload objPayload = new Payload("retrieveHistory", "Teste");
@@ -208,9 +225,13 @@ public class MyHttpClient {
             Payload responsePayloadObj = HttpConnect(objPayload, "");
 
             System.out.println(responsePayloadObj.get("response"));
-        
+
+            Utils.ClearConsole();
+
+            History.ReadHistory(cliente);
+                
         } catch (Exception e) {
-            System.out.println("Erro na comunicação: " + e.toString());
+            System.out.println("Erro na comunicação: " + e.getClass());
         }
     }
 
@@ -280,10 +301,9 @@ public class MyHttpClient {
 
     public static void main(String[] args) throws IOException {
 
-        Scanner scanner = new Scanner(System.in);
-
         System.out.println("> ==== > ZCChat < ==== <\n\nSeja bem-vindo, selecione uma opcao:\n 1 - Realizar login\n 2 - Criar login\nOutro - Sair");
         int input = scanner.nextInt();
+        scanner.nextLine();
 
         if (input > 2 || input < 1) {
             System.out.println("Saindo...");
@@ -293,10 +313,10 @@ public class MyHttpClient {
             client_singup();
         }
 
-        client_logon();
+        Usuario cliente = client_logon();
 
         // Inicializa Login
-        client_menu();
+        client_menu(cliente);
 
         scanner.close();
 
