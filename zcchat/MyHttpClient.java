@@ -320,7 +320,7 @@ public class MyHttpClient {
             } else {
                 String log = "[" + mensagem.get_timestamp().toString() + "] Eu -> " + mensagem.get_destinatario().get_username() + ": " + mensagem.get_text();
                 System.out.println(log);
-                History.writeHistory(mensagem, log);
+                History.writeHistory(cliente, log);
             }
 
         } catch (Exception e) {
