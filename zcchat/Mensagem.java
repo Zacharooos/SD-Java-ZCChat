@@ -1,9 +1,10 @@
 package zcchat;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.UUID;
 
-public class Mensagem{
+public class Mensagem implements Serializable{
     private final String id = UUID.randomUUID().toString().replace("-", "");
     private final Date timestamp = new Date (System.currentTimeMillis());
     private String text;

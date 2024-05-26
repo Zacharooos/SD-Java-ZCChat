@@ -112,7 +112,9 @@ public class MyHttpClient {
                 while (true) {
                     try {
                         System.out.println("Pingando servidor");
-                        HttpConnect(pingPayload, "ping");
+                        Payload response = HttpConnect(pingPayload, "ping");
+                        // TODO: Ler response com mensagens
+                        
                         Thread.sleep(30000);
                     } catch (Exception err) {
                         err.printStackTrace();
@@ -280,32 +282,29 @@ public class MyHttpClient {
         }
     }
 
-    public static void ClienteMessageContactOnline(Usuario cliente, String name, String msg) {
-        try {
-            
-            // Precisa fazer um get_User com o servidor, usando si proprio por enquanto
-            Mensagem mensagem = new Mensagem(msg, cliente, cliente);
-            
+    public static void ClienteMessageContactOnline(Usuario cliente, String destinatario, String msg) {
+        try { 
             // Montando corpo da requisição, passando nome e mensagem
-            Payload objPayload = new Payload(cliente.get_username()); // TODO: Montar peyload certa
-            objPayload.put("mensagem", mensagem.get_text());
+            Payload objPayload = new Payload(cliente.get_username());
+            objPayload.put("recipient", destinatario);
+            objPayload.put("message", msg);
             
             // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload, "");
+            Payload responsePayloadObj = HttpConnect(objPayload, "sendMessage");
 
-            String response = responsePayloadObj.get("response").toString();
-            System.out.println(response);
-            
-            if (response == "UserNotFound"){
+            String response = responsePayloadObj.get("response").toString();            
+            if (response.equals("OK")){
+                System.out.println("Mensagem enviada com sucesso!");
+            } else if (response.equals("DESTINATARIO OFFLINE")){
                 System.out.println("O usuario nao esta online no momento!");
-            
-            } else if (response == "ServerError"){
-                System.out.println("O houve algum erro durante o processamento, tente novamente!");
-            } else {
-                String log = "[" + mensagem.get_timestamp().toString() + "] Eu -> " + mensagem.get_destinatario().get_username() + ": " + mensagem.get_text();
-                System.out.println(log);
-                History.writeHistory(mensagem, log);
+                return;
             }
+
+            // Recuperando mensagem e escrevendo log
+            Mensagem mensagem = (Mensagem) responsePayloadObj.get("sentMessage");
+            String log = "[" + mensagem.get_timestamp().toString() + "] Eu -> " + mensagem.get_destinatario().get_username() + ": " + mensagem.get_text();
+            System.out.println(log);
+            History.writeHistory(mensagem, log);
 
         } catch (Exception e) {
             System.out.println("Erro na comunicação: " + e.toString());

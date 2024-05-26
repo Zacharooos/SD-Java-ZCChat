@@ -151,4 +151,25 @@ public class Handles {
             sendResponse(exchange, responsePayload);
         }
     }
+
+    // Handle para envio de mensagem
+    static class SendMessageHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Recebe o corpo da requisição
+            Payload payloadObj = recieveRequest(exchange);
+
+            // Obtendo valores do payload
+            String author = (String) payloadObj.get("author");
+            String recipient = (String) payloadObj.get("recipient");
+            String messageText = (String) payloadObj.get("message");
+
+            // Fazemdp enviando dados ao controller e pegando payload de resposta
+            Controller controller = Controller.getController();
+            Payload responsePayload = controller.sendMessage(author, recipient, messageText);
+
+            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
+            sendResponse(exchange, responsePayload);
+        }
+    }
 }

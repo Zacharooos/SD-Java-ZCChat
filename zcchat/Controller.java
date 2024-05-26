@@ -1,6 +1,8 @@
 package zcchat;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import persistence.Serializer;
@@ -8,12 +10,14 @@ import persistence.Serializer;
 public class Controller implements Serializable {
     private static Controller instance;
 
-    private Map<String, Usuario> users;
-    private Map<String, Usuario> onlineUsers;
+    private Map<String, Usuario> users; // Lista de usuarios cadastrados
+    private Map<String, Usuario> onlineUsers; // Lista de usuarios atualmente online
+    private Map<String, List<Mensagem>> messageQueue; // Lista de mensagens a serem enviadas (para cada username)
 
     private Controller(){
         users = new TreeMap<>();
         onlineUsers = new TreeMap<>();
+        messageQueue = new TreeMap<>();
     }
 
     public String addUser(String username, String password){
@@ -60,11 +64,11 @@ public class Controller implements Serializable {
                 while (true) {
                     try{
                         System.out.println("checking... " + username + "\n");
-                        if (!user.checkLastPing()) {
-                            System.out.println("User " + username + " desconectado\n");
-                            instance.logoutUser(username);
-                            return;
-                        }
+                        // if (!user.checkLastPing()) {
+                        //     System.out.println("User " + username + " desconectado\n");
+                        //     instance.logoutUser(username);
+                        //     return;
+                        // }
                         Thread.sleep(30000);
                     }catch(InterruptedException err){
                         System.out.println("Erro no PingListener do user " + username + "\n");
@@ -87,6 +91,42 @@ public class Controller implements Serializable {
         }
         user.ping();
         return "OK";
+    }
+
+    // Funções de mensagens
+    public Payload sendMessage(String author, String recipient, String messageText){
+        // Declarando payload de resposta
+        Payload ret = new Payload("SERVER");
+
+        // Verifiando se usuarios se encontram online
+        Usuario recipientObj = instance.onlineUsers.get(recipient);
+        Usuario authorObj = instance.onlineUsers.get(author);
+        if(recipientObj == null){
+            ret.put("response", "DESTINATARIO OFFLINE");
+            return ret;
+        }
+        if (authorObj == null) {
+            ret.put("response", "AUTOR OFFLINE");
+            return ret;
+        }
+        ret.put("response", "OK");
+
+        // Criando mensagem e colocando na fila
+        System.out.println(messageText);
+        Mensagem message = new Mensagem(messageText, authorObj, recipientObj);
+        List<Mensagem> userMessagesList = instance.messageQueue.get(recipient);
+        if(userMessagesList == null){
+            userMessagesList = new ArrayList<Mensagem>();
+            instance.messageQueue.put(recipient, userMessagesList);
+        }
+        userMessagesList.add(message);
+        
+        Controller.save();
+
+        // Adicionando mensagem ao retorno
+        ret.put("sentMessage", message);
+
+        return ret;
     }
 
 
