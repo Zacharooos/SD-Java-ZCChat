@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.File;
 
-import zcchat.Mensagem;
 import zcchat.Usuario;
 
 public class History {
@@ -26,10 +25,10 @@ public class History {
         }
     }
 
-    public static void writeHistory(Mensagem mensagem, String log) {
+    public static void writeHistory(Usuario cliente, String log) {
         createFile("historico");
 
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("historico/" + mensagem.get_emissor().get_username() + ".bin", true))) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("historico/" + cliente.get_username() + ".txt", true))) {
             dos.writeUTF(log);
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,7 +36,7 @@ public class History {
     }
 
     public static void ReadHistory(Usuario cliente) {
-        try (DataInputStream dis = new DataInputStream(new FileInputStream("historico/" + cliente.get_username() + ".bin"))) {
+        try (DataInputStream dis = new DataInputStream(new FileInputStream("historico/" + cliente.get_username() + ".txt"))) {
             
             System.out.println(" < ============= Historico ============= >\n");
             while (true) {

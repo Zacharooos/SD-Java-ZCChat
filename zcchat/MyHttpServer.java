@@ -15,6 +15,8 @@ public class MyHttpServer {
 
         server.createContext("/", new Handles.SampleHandler());
         server.createContext("/createUser", new Handles.CreateAccountHandler());
+        server.createContext("/deleteUSer", new Handles.DeleteAccountHandler());
+        server.createContext("/alterPassword", new Handles.AlterPasswordHandle());
         server.createContext("/login", new Handles.LoginHandler());
         server.createContext("/logout", new Handles.LogoutHandler());
         server.createContext("/ping", new Handles.PingHandler());
