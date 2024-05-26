@@ -27,6 +27,12 @@ public class Controller implements Serializable {
         return "OK";
     }
 
+    public String deleteUser (String username){
+        instance.users.remove(username, instance.users.get(username));
+        Controller.save();
+        return "OK";
+    }
+
     public String alterPassword (String username, String newPassword){
         instance.users.replace(username, instance.users.get(username), new Usuario(username, newPassword));
         Controller.save();

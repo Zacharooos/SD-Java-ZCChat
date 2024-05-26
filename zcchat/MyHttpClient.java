@@ -161,26 +161,7 @@ public class MyHttpClient {
                     System.out.println("    > Nova senha:\n");
                     input1 = scanner.nextLine();
 
-                    try {
-                        // Montando corpo da requisição
-                        Payload loginPaylodObj = new Payload(cliente.get_username());
-                        loginPaylodObj.put("username", cliente.get_username());
-                        loginPaylodObj.put("password", input1);
-                        
-                        // Enviando Payload e recebendo resposta
-                        Payload responsePayloadObj = HttpConnect(loginPaylodObj, "alterPassword");
-            
-                        if (responsePayloadObj.get("response").equals("OK")){
-                            System.out.println("TROCA REALIZADA");
-                            break;
-                        }
-                        System.out.println(responsePayloadObj.get("response").toString());
-                        
-                    } catch (Exception e) {
-                        System.out.println("Erro na comunicação: " + e.toString());
-                    }    
-
-                    cliente.changePassword(input1);
+                    GerenciaAlterPassword(cliente, input1);
 
                     System.out.println("Troca de senha concluida com sucesso!...");
 
@@ -208,7 +189,17 @@ public class MyHttpClient {
                     
                     if (!input1.equals("2")) {break;}
 
-                    //c Remover conta
+                    Boolean sucesse = GerenciaDeleteUser(cliente);
+
+                    if (sucesse.equals(true)){
+                        History.removeHistory(cliente);
+                        System.out.println("Usuario apagado com sucesso!");
+                        System.exit(0);
+                     
+                    } else {
+                        return;
+                    }
+
 
                 default:
                     System.out.println("Saindo");
@@ -368,6 +359,56 @@ public class MyHttpClient {
         gerencia_menu(cliente);
     }
 
+    public static void GerenciaAlterPassword(Usuario cliente, String password){
+        // Enviado solicitacao ao servidor
+
+        try {
+            // Montando corpo da requisição
+            Payload loginPaylodObj = new Payload(cliente.get_username());
+            loginPaylodObj.put("username", cliente.get_username());
+            loginPaylodObj.put("password", password);
+            
+            // Enviando Payload e recebendo resposta
+            Payload responsePayloadObj = HttpConnect(loginPaylodObj, "alterPassword");
+
+            if (responsePayloadObj.get("response").equals("OK")){
+                System.out.println("TROCA REALIZADA");
+                return;
+            }
+            System.out.println(responsePayloadObj.get("response").toString());
+            
+        } catch (Exception e) {
+            System.out.println("Erro na comunicação: " + e.toString());
+        }    
+
+        cliente.changePassword(password);
+    }
+
+    public static Boolean GerenciaDeleteUser(Usuario cliente){
+        // Enviado solicitacao ao servidor
+
+        try {
+            // Montando corpo da requisição
+            Payload loginPaylodObj = new Payload(cliente.get_username());
+            loginPaylodObj.put("username", cliente.get_username());
+            
+            // Enviando Payload e recebendo resposta
+            Payload responsePayloadObj = HttpConnect(loginPaylodObj, "deleteUser");
+
+            if (responsePayloadObj.get("response").equals("OK")){
+                System.out.println("USUARIO APAGADO");
+                return true;
+            }
+            System.out.println(responsePayloadObj.get("response").toString());
+            
+        } catch (Exception e) {
+            System.out.println("Erro na comunicação: " + e.toString());
+        }    
+
+        return false;
+        //cliente.changePassword(password);
+    }
+    
     @SuppressWarnings("deprecation")
     public static Payload HttpConnect(Payload requestPayloadObj, String route) throws IOException{
         // Configurando conexão

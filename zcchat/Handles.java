@@ -80,6 +80,28 @@ public class Handles {
     }
 
     // Handle para criação de conta
+    static class DeleteAccountHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Recebe o corpo da requisição
+            Payload payloadObj = recieveRequest(exchange);
+
+            // Obtendo valores do payload
+            String username = (String) payloadObj.get("username");
+
+            // Salvando no controller
+            Controller controller = Controller.getController();
+            String ret = controller.deleteUser(username);
+
+            // Montando resposta para cliente
+            Payload responsePayload = new Payload("SERVER", ret);
+
+            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
+            sendResponse(exchange, responsePayload);
+        }
+    }
+
+    // Handle para criação de conta
     static class AlterPasswordHandle implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
