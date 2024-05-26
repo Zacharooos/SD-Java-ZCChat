@@ -79,6 +79,29 @@ public class Handles {
         }
     }
 
+    // Handle para criação de conta
+    static class AlterPasswordHandle implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Recebe o corpo da requisição
+            Payload payloadObj = recieveRequest(exchange);
+
+            // Obtendo valores do payload
+            String username = (String) payloadObj.get("username");
+            String password = (String) payloadObj.get("password");
+
+            // Salvando no controller
+            Controller controller = Controller.getController();
+            String ret = controller.alterPassword(username, password);
+
+            // Montando resposta para cliente
+            Payload responsePayload = new Payload("SERVER", ret);
+
+            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
+            sendResponse(exchange, responsePayload);
+        }
+    }
+
     // Handle para login de usuario
     static class LoginHandler implements HttpHandler {
         @Override

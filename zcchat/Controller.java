@@ -27,6 +27,12 @@ public class Controller implements Serializable {
         return "OK";
     }
 
+    public String alterPassword (String username, String newPassword){
+        instance.users.replace(username, instance.users.get(username), new Usuario(username, newPassword));
+        Controller.save();
+        return "OK";
+    }
+
     public String loginUser(String username, String password){
         Usuario user = instance.users.get(username);
         if (user == null) {

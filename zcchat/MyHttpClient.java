@@ -161,7 +161,24 @@ public class MyHttpClient {
                     System.out.println("    > Nova senha:\n");
                     input1 = scanner.nextLine();
 
-                    // Payload da troca de senha
+                    try {
+                        // Montando corpo da requisição
+                        Payload loginPaylodObj = new Payload(cliente.get_username());
+                        loginPaylodObj.put("username", cliente.get_username());
+                        loginPaylodObj.put("password", input1);
+                        
+                        // Enviando Payload e recebendo resposta
+                        Payload responsePayloadObj = HttpConnect(loginPaylodObj, "alterPassword");
+            
+                        if (responsePayloadObj.get("response").equals("OK")){
+                            System.out.println("TROCA REALIZADA");
+                            break;
+                        }
+                        System.out.println(responsePayloadObj.get("response").toString());
+                        
+                    } catch (Exception e) {
+                        System.out.println("Erro na comunicação: " + e.toString());
+                    }    
 
                     cliente.changePassword(input1);
 
@@ -170,7 +187,6 @@ public class MyHttpClient {
                     break;
 
                 case 2:
-                    // Precisa de outro switch para perguntar qual o contato da comunicação.
                     Utils.ClearConsole();
                     
                     System.out.println("Tem certeza que deseja APAGAR o HISTORICO (Irreversivel)?\n 1 - Nao\n 2 - Sim\n");
