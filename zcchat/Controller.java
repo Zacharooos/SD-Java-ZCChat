@@ -38,7 +38,12 @@ public class Controller implements Serializable {
     }
 
     public String alterPassword (String username, String newPassword){
-        instance.users.replace(username, instance.users.get(username), new Usuario(username, newPassword));
+        // Pegando usuario informado
+        Usuario user = instance.users.get(username);
+
+        // Alterando senha utilizando metodo do user
+        user.changePassword(newPassword);
+
         Controller.save();
         return "OK";
     }
