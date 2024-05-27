@@ -57,7 +57,7 @@ public class History {
 
     public static void removeHistory(Usuario cliente) {
 
-        String filePath = "historico/" + cliente.get_username() + ".bin";  
+        String filePath = "historico/" + cliente.get_username() + ".txt";  
 
         File file = new File(filePath);
 

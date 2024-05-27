@@ -191,9 +191,10 @@ public class MyHttpClient {
                     
                     if (!input1.equals("2")) {break;}
 
-                    Boolean sucesse = GerenciaDeleteUser(cliente);
+                    Boolean sucesso = GerenciaDeleteUser(cliente);
+                    System.out.println(sucesso);
 
-                    if (sucesse.equals(true)){
+                    if (sucesso == true){
                         History.removeHistory(cliente);
                         System.out.println("Usuario apagado com sucesso!");
                         System.exit(0);
