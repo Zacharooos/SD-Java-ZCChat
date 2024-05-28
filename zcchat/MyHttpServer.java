@@ -20,6 +20,7 @@ public class MyHttpServer {
         server.createContext("/login", new Handles.LoginHandler());
         server.createContext("/logout", new Handles.LogoutHandler());
         server.createContext("/ping", new Handles.PingHandler());
+        server.createContext("/pingList", new Handles.ListPingHandler());
         server.createContext("/sendMessage", new Handles.SendMessageHandler());
         server.setExecutor(null);
         server.start();

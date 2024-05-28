@@ -227,7 +227,7 @@ public class MyHttpClient {
                 case 1:
                     Utils.ClearConsole();
                     System.out.println("Procurando contatos...");
-                    ClienteRetrieveContactsOnline();
+                    ClienteRetrieveContactsOnline(cliente);
                     // Utils.DisplayList();
                     // Exibir lista de contatos Online
 
@@ -274,16 +274,20 @@ public class MyHttpClient {
         }
 	}
 	
-    public static void ClienteRetrieveContactsOnline() {
+    public static void ClienteRetrieveContactsOnline(Usuario cliente) {
         try {
             // Montando corpo da requisição
-            Payload objPayload = new Payload("retrieveContactsOnline", "Teste");
+            Payload objPayload = new Payload(cliente.get_username());
             
             // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload, "");
+            Payload responsePayloadObj = HttpConnect(objPayload, "pingList");
+
+            if (responsePayloadObj.get("response") == null){
+                System.out.println("Ninguem por aqui... cri cri... cri cri...");
+                return;
+            }
 
             System.out.println(responsePayloadObj.get("response"));
-            
         
         } catch (Exception e) {
             System.out.println("Erro na comunicação: " + e.toString());

@@ -82,7 +82,7 @@ public class Controller implements Serializable {
                     try{
                         System.out.println("checking... " + username + "\n");
                         // if (!user.checkLastPing()) {
-                        //     System.out.println("User " + username + " desconectado\n");
+                        //    System.out.println("User " + username + " desconectado\n");
                         //     instance.logoutUser(username);
                         //     return;
                         // }
@@ -99,6 +99,12 @@ public class Controller implements Serializable {
         thread.start();
 
         return;
+    }
+
+    public String pingList(String username){
+        List<String> temp = new ArrayList<>(instance.onlineUsers.keySet());
+        temp.remove(username);
+        return temp.toString();
     }
 
     public String pingUser(String username){
