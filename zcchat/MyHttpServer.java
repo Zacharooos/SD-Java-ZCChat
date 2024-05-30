@@ -16,11 +16,12 @@ public class MyHttpServer {
 
         server.createContext("/", new Handles.SampleHandler());
         server.createContext("/createUser", new Handles.CreateAccountHandler());
-        server.createContext("/deleteUSer", new Handles.DeleteAccountHandler());
+        server.createContext("/deleteUser", new Handles.DeleteAccountHandler());
         server.createContext("/alterPassword", new Handles.AlterPasswordHandle());
         server.createContext("/login", new Handles.LoginHandler());
         server.createContext("/logout", new Handles.LogoutHandler());
         server.createContext("/ping", new Handles.PingHandler());
+        server.createContext("/pingList", new Handles.ListPingHandler());
         server.createContext("/sendMessage", new Handles.SendMessageHandler());
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();

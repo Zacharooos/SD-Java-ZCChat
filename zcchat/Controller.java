@@ -86,7 +86,7 @@ public class Controller implements Serializable {
                     try{
                         System.out.println("checking... " + username + "\n");
                         // if (!user.checkLastPing()) {
-                        //     System.out.println("User " + username + " desconectado\n");
+                        //    System.out.println("User " + username + " desconectado\n");
                         //     instance.logoutUser(username);
                         //     return;
                         // }
@@ -131,6 +131,7 @@ public class Controller implements Serializable {
                 return;
             }
 
+            
             // Verificando se tem mensagem nova e montando payload
             if (userMessagesList.isEmpty()) {
                 response = new Payload("SERVER", "OK");
@@ -139,12 +140,17 @@ public class Controller implements Serializable {
                 Mensagem message = userMessagesList.remove(0);
                 response.put("message", message);
             }
-
+            
             // Enviando response
             Handles.sendResponse(exchange, response);
         }
     }
-
+    
+    public String pingList(String username){
+        List<String> temp = new ArrayList<>(instance.onlineUsers.keySet());
+        temp.remove(username);
+        return temp.toString();
+    }
     // Funções de mensagens
     public Payload sendMessage(String author, String recipient, String messageText){
         // Declarando payload de resposta

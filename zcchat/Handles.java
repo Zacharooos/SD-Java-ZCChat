@@ -170,6 +170,28 @@ public class Handles {
         }
     }
 
+    // Handle para listar usuarios logados
+    static class ListPingHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Recebe o corpo da requisição
+            Payload payloadObj = recieveRequest(exchange);
+
+            // Obtendo valores do payload
+            String username = (String) payloadObj.get("author");
+
+            // Fazemdp ping pelo controller
+            Controller controller = Controller.getController();
+            String ret = controller.pingList(username);
+
+            // Montando resposta para cliente
+            Payload responsePayload = new Payload("SERVER", ret);
+
+            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
+            sendResponse(exchange, responsePayload);
+        }
+    }
+
     // Handle para logout de usuario
     static class LogoutHandler implements HttpHandler {
         @Override
