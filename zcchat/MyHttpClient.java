@@ -101,38 +101,53 @@ public class MyHttpClient {
 
         // Iniciando thread de ping para servidor
         class PingThread extends Thread {
-            private String username;
+            private Usuario user;
 
-            public PingThread(String username){
-                this.username = username;
+            public PingThread(Usuario user){
+                this.user = user;
             }
 
             public void run() {
-                Payload pingPayload = new Payload(username);
+                Payload pingPayload = new Payload(user.get_username());
                 while (true) {
                     try {
                         System.out.println("Pingando servidor");
                         Payload response = HttpConnect(pingPayload, "ping");
-                        // TODO: Ler response com mensagens
+                        if (response.get("response").equals("OK")) {
+                            continue;
+                        }
+                        else if(response.get("response").equals("NEW MESSAGE")){
+                            Mensagem mensagem = (Mensagem) response.get("message");
+                            System.out.println("NOVA MENSAGEEEEEM!!!!");
+                            String log = "[" + mensagem.get_timestamp().toString() + "] " + mensagem.get_emissor() +" -> "
+                            + mensagem.get_destinatario().get_username() + ": " + mensagem.get_text();
+                            System.out.println(log);
+                            History.writeHistory(user, log);
+
+                        }
+                        else{
+                            System.err.println(response.get("response"));
+                        }
                         
-                        Thread.sleep(30000);
                     } catch (Exception err) {
                         err.printStackTrace();
                         System.out.println("Erro ao realizar ping. Conexao com servidor interrompida!");
+                        System.exit(0);
                     }
 
                 }
             }
         }
-
-        PingThread pingThread = new PingThread(login);
-        pingThread.setDaemon(true);
-        pingThread.start();
         
         // TODO: Guardar o usuário que está logado!
         // Temporariamente criando um cliente novo para teste
         // Recomendo guardar pela string do username - CJ
         Usuario cliente = new Usuario(login, password);
+
+        PingThread pingThread = new PingThread(cliente);
+        pingThread.setDaemon(true);
+        pingThread.start();
+
         return cliente;
 	}
     

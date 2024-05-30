@@ -1,11 +1,13 @@
 package zcchat;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import persistence.Serializer;
+import com.sun.net.httpserver.HttpExchange;
 
 public class Controller implements Serializable {
     private static Controller instance;
@@ -13,11 +15,13 @@ public class Controller implements Serializable {
     private Map<String, Usuario> users; // Lista de usuarios cadastrados
     private Map<String, Usuario> onlineUsers; // Lista de usuarios atualmente online
     private Map<String, List<Mensagem>> messageQueue; // Lista de mensagens a serem enviadas (para cada username)
+    private Map<String, HttpExchange> clientQueue; // Lista das conexões dos users. Utilizadas para enviar as mensagens.
 
     private Controller(){
         users = new TreeMap<>();
         onlineUsers = new TreeMap<>();
         messageQueue = new TreeMap<>();
+        clientQueue = new TreeMap<>();
     }
 
     public String addUser(String username, String password){
@@ -97,17 +101,48 @@ public class Controller implements Serializable {
         // Iniciando thread de verificação
         PingListener thread = new PingListener();
         thread.start();
-
-        return;
     }
 
-    public String pingUser(String username){
-        Usuario user = instance.onlineUsers.get(username);
-        if(user == null){
-            return "SESSAO EXPIRADA";
+    public void pingUser(String username, HttpExchange exchange) throws IOException{
+        Payload response;
+        synchronized (instance.onlineUsers) {
+            Usuario user = instance.onlineUsers.get(username);
+            if (user == null) {
+                response = new Payload("SERVER", "SESSAO EXPIRADA");
+                    Handles.sendResponse(exchange, response);
+                return;
+            }
+            user.ping();
         }
-        user.ping();
-        return "OK";
+
+        // Recuperando lista de mensagens do usuario
+        List<Mensagem> userMessagesList = instance.messageQueue.get(username);
+        if (userMessagesList == null) {
+            userMessagesList = new ArrayList<Mensagem>();
+        }
+        synchronized (userMessagesList) {
+            // Aguardando por uma mensagem ou timeout
+            try {
+                userMessagesList.wait(30000);
+                // Thread.sleep(15000);
+
+            } catch (InterruptedException err) {
+                err.printStackTrace();
+                return;
+            }
+
+            // Verificando se tem mensagem nova e montando payload
+            if (userMessagesList.isEmpty()) {
+                response = new Payload("SERVER", "OK");
+            } else {
+                response = new Payload("SERVER", "NEW MESSAGE");
+                Mensagem message = userMessagesList.remove(0);
+                response.put("message", message);
+            }
+
+            // Enviando response
+            Handles.sendResponse(exchange, response);
+        }
     }
 
     // Funções de mensagens
@@ -136,14 +171,42 @@ public class Controller implements Serializable {
             userMessagesList = new ArrayList<Mensagem>();
             instance.messageQueue.put(recipient, userMessagesList);
         }
-        userMessagesList.add(message);
-        
-        Controller.save();
+        synchronized(userMessagesList){
+            userMessagesList.add(message);
 
+            // Notificando thread de ping do destinatario
+            userMessagesList.notifyAll();
+            
+            // Controller.save();
+        }
         // Adicionando mensagem ao retorno
         ret.put("sentMessage", message);
 
         return ret;
+    }
+
+    // Função que "entrega" mensagem ao destinatario
+    public boolean notifyClient(String clientName){
+        // Verificando se temos exchange e mensagens nas fila
+        HttpExchange clientExchange = instance.clientQueue.get(clientName);
+        List<Mensagem> userMessagesList = instance.messageQueue.get(clientName);
+        if (clientExchange == null || userMessagesList == null) {
+            return false;
+        }
+
+        // Montando payload com mensagem(s)
+        Payload response = new Payload("SERVER", "NEW MESSAGES");
+        response.put("messages", userMessagesList);
+
+        // Enviando resposta
+        try{
+            Handles.sendResponse(clientExchange, response);
+        }catch(IOException err){
+            err.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 
 

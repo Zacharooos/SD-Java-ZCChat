@@ -23,7 +23,7 @@ public class Handles {
         return payloadObj;
     }
 
-    static private void sendResponse(HttpExchange exchange, Payload responsePayload) throws IOException{
+    static public void sendResponse(HttpExchange exchange, Payload responsePayload) throws IOException{
         String response = Payload.serializeHashMap(responsePayload);
 
         // Responde com um código de status 200 (OK) e o corpo da requisição recebido
@@ -162,16 +162,11 @@ public class Handles {
 
             // Obtendo valores do payload
             String username = (String) payloadObj.get("author");
+            System.out.println("PING RECEBIDO: " + username + "\n");
 
-            // Fazemdp ping pelo controller
+            // Iniciando thread no controller
             Controller controller = Controller.getController();
-            String ret = controller.pingUser(username);
-
-            // Montando resposta para cliente
-            Payload responsePayload = new Payload("SERVER", ret);
-
-            // Responde com um código de status 200 (OK) e o corpo da requisição recebido
-            sendResponse(exchange, responsePayload);
+            controller.pingUser(username, exchange);
         }
     }
 

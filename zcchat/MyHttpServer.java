@@ -3,6 +3,7 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
 public class MyHttpServer {
     public static void main(String[] args) throws IOException {
@@ -21,7 +22,7 @@ public class MyHttpServer {
         server.createContext("/logout", new Handles.LogoutHandler());
         server.createContext("/ping", new Handles.PingHandler());
         server.createContext("/sendMessage", new Handles.SendMessageHandler());
-        server.setExecutor(null);
+        server.setExecutor(Executors.newCachedThreadPool());
         server.start();
 
         System.out.println("Server started on port " + port);
