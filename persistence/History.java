@@ -1,7 +1,7 @@
 package persistence;
 
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,8 +28,12 @@ public class History {
     public static void writeHistory(Usuario cliente, String log) {
         createFile("historico");
 
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("historico/" + cliente.get_username() + ".txt", true))) {
-            dos.writeUTF(log + "\n");
+        String filePath = "historico/" + cliente.get_username() + ".txt";
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            writer.write(log);
+            writer.newLine();
+            // System.out.println("Texto adicionado ao arquivo com sucesso.");
         } catch (IOException e) {
             e.printStackTrace();
         }
