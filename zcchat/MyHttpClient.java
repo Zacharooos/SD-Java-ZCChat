@@ -4,6 +4,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.util.List;
 import java.util.Scanner;
 
 import persistence.History;
@@ -273,7 +274,11 @@ public class MyHttpClient {
                 case 4:
                     Utils.ClearConsole();
                     System.out.println("Enviado mensagem broadcast");
-                    ClienteMessageAllContacts();
+
+                    System.out.println("Informe a sua mensagem:");
+                    input1 = scanner.nextLine();
+
+                    ClienteMessageAllContacts(cliente, input1);
                     break;
 
                 case 5:
@@ -368,18 +373,37 @@ public class MyHttpClient {
         }
     }
 
-    public static void ClienteMessageAllContacts() {
+    public static void ClienteMessageAllContacts(Usuario cliente, String messageText) {
         try {
             // Montando corpo da requisição
-            Payload objPayload = new Payload("messageAllContacts", "Teste");
+            Payload objPayload = new Payload(cliente.get_username());
+            objPayload.put("message", messageText);
             
             // Enviando Payload e recebendo resposta
-            Payload responsePayloadObj = HttpConnect(objPayload, "");
+            Payload responsePayloadObj = HttpConnect(objPayload, "sendToAll");
 
-            System.out.println(responsePayloadObj.get("response"));
+            // Recuperando mensagems e escrevendo logs
+            if (responsePayloadObj.get("response").equals("OK")) {
+                System.out.println("Mensagens enviadas!!");
+                List<Mensagem> sentMessages = (List<Mensagem>) responsePayloadObj.get("sentMessages");
+                for (Mensagem mensagem : sentMessages) {
+                    String log = "[" + mensagem.get_timestamp_string() + "] Eu -> " + mensagem.get_destinatario().get_username()
+                        + ": " + mensagem.get_text();
+                    
+                    System.out.println(log);
+                    History.writeHistory(cliente, log);                
+                }
+            }
+            else if(responsePayloadObj.get("response").equals("NOT FOUND")){
+                System.out.println("Nenhum usuário online...");
+            }
+            else{
+                System.out.println("Erro ao enviar mensagens");
+            }
         
         } catch (Exception e) {
             System.out.println("Erro na comunicação: " + e.toString());
+            e.printStackTrace();
         }
     }
 

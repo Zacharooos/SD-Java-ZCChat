@@ -10,7 +10,6 @@ public class MyHttpServer {
         // Iniciando controller
         Controller.load();
 
-        // TODO: Fazer try catch?
         int port = 8000;
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
@@ -23,6 +22,7 @@ public class MyHttpServer {
         server.createContext("/ping", new Handles.PingHandler());
         server.createContext("/pingList", new Handles.ListPingHandler());
         server.createContext("/sendMessage", new Handles.SendMessageHandler());
+        server.createContext("/sendToAll", new Handles.SendMessageToAllHandler());
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
 

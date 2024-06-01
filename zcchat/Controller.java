@@ -155,8 +155,9 @@ public class Controller implements Serializable {
         temp.remove(username);
         return temp.toString();
     }
+
     // Funções de mensagens
-    public Payload sendMessage(String author, String recipient, String messageText){
+    public Payload sendMessage(String author, String messageText, String recipient){
         // Declarando payload de resposta
         Payload ret = new Payload("SERVER");
 
@@ -191,6 +192,52 @@ public class Controller implements Serializable {
         }
         // Adicionando mensagem ao retorno
         ret.put("sentMessage", message);
+
+        return ret;
+    }
+
+    // Função que envia mensagem para todos os usuarios online
+    public Payload sendMessage(String author, String messageText){
+        // Declarando payload de resposta
+        Payload ret = new Payload("SERVER");
+        List<Mensagem> sentMessagesList = new ArrayList<Mensagem>();
+        
+        // Mandando para todos users online
+        Usuario authorObj = instance.onlineUsers.get(author);
+        for (Usuario recipient : instance.onlineUsers.values()) {
+            // Pulando caso seja o autor
+            if(recipient.get_username().equals(author)){
+                continue;
+            }
+
+            // Criando mensagem e colocando na fila
+            Mensagem message = new Mensagem(messageText, authorObj, recipient);
+            List<Mensagem> userMessagesList = instance.messageQueue.get(recipient.get_username());
+
+            if (userMessagesList == null) {
+                userMessagesList = new ArrayList<Mensagem>();
+                instance.messageQueue.put(recipient.get_username(), userMessagesList);
+            }
+
+            synchronized (userMessagesList) {
+                userMessagesList.add(message);
+    
+                // Notificando thread de ping do destinatario
+                userMessagesList.notifyAll();
+            }
+
+            sentMessagesList.add(message);
+        }
+        
+        // Adicionando mensagem ao retorno
+        System.out.println(messageText);
+        if(sentMessagesList.size() == 0){
+            ret.put("response", "NOT FOUND");    
+        }
+        else{
+            ret.put("response", "OK");
+            ret.put("sentMessages", sentMessagesList);
+        }
 
         return ret;
     }
