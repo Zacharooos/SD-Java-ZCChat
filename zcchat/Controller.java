@@ -60,6 +60,11 @@ public class Controller implements Serializable {
         if (!user.validatePassword(password)){
             return "SENHA INCORRETA";
         }
+
+        // Verificando se usuario ja esta online
+        if(instance.onlineUsers.get(username) != null){
+            return "USUARIO JA LOGADO";
+        }
         instance.onlineUsers.put(username, user);
         user.turnStatus(1);
         user.ping();
