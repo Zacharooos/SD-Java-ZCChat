@@ -111,15 +111,16 @@ public class MyHttpClient {
                 Payload pingPayload = new Payload(user.get_username());
                 while (true) {
                     try {
-                        System.out.println("Pingando servidor");
+                        // System.out.println("Pingando servidor");
                         Payload response = HttpConnect(pingPayload, "ping");
+                        // System.out.println(response.get("response"));
                         if (response.get("response").equals("OK")) {
                             continue;
                         }
                         else if(response.get("response").equals("NEW MESSAGE")){
                             Mensagem mensagem = (Mensagem) response.get("message");
-                            System.out.println("NOVA MENSAGEEEEEM!!!!");
-                            String log = "[" + mensagem.get_timestamp().toString() + "] " + mensagem.get_emissor() +" -> "
+                            System.out.println("NOVA MENSAGEM!");
+                            String log = "[" + mensagem.get_timestamp_string() + "] " + mensagem.get_emissor().get_username() +" -> "
                             + mensagem.get_destinatario().get_username() + ": " + mensagem.get_text();
                             System.out.println(log);
                             History.writeHistory(user, log);
@@ -329,7 +330,7 @@ public class MyHttpClient {
 
             // Recuperando mensagem e escrevendo log
             Mensagem mensagem = (Mensagem) responsePayloadObj.get("sentMessage");
-            String log = "[" + mensagem.get_timestamp().toString() + "] Eu -> " + mensagem.get_destinatario().get_username() + ": " + mensagem.get_text();
+            String log = "[" + mensagem.get_timestamp_string() + "] Eu -> " + mensagem.get_destinatario().get_username() + ": " + mensagem.get_text();
             System.out.println(log);
             History.writeHistory(cliente, log);
 

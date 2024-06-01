@@ -29,7 +29,7 @@ public class History {
         createFile("historico");
 
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("historico/" + cliente.get_username() + ".txt", true))) {
-            dos.writeUTF(log);
+            dos.writeUTF(log + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

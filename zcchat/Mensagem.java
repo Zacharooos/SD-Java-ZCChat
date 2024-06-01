@@ -1,7 +1,8 @@
 package zcchat;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public class Mensagem implements Serializable{
@@ -36,5 +37,11 @@ public class Mensagem implements Serializable{
 
     public Date get_timestamp(){
         return this.timestamp;
+    }
+
+    public String get_timestamp_string(){
+        SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String timestampString = formater.format(timestamp);
+        return timestampString;
     }
 }

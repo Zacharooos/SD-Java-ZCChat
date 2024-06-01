@@ -85,11 +85,11 @@ public class Controller implements Serializable {
                 while (true) {
                     try{
                         System.out.println("checking... " + username + "\n");
-                        // if (!user.checkLastPing()) {
-                        //    System.out.println("User " + username + " desconectado\n");
-                        //     instance.logoutUser(username);
-                        //     return;
-                        // }
+                        if (instance.onlineUsers.get(username) == null || !user.checkLastPing()) {
+                            System.out.println("User " + username + " desconectado\n");
+                            instance.logoutUser(username);
+                            return;
+                        }
                         Thread.sleep(30000);
                     }catch(InterruptedException err){
                         System.out.println("Erro no PingListener do user " + username + "\n");
@@ -119,6 +119,7 @@ public class Controller implements Serializable {
         List<Mensagem> userMessagesList = instance.messageQueue.get(username);
         if (userMessagesList == null) {
             userMessagesList = new ArrayList<Mensagem>();
+            instance.messageQueue.put(username, userMessagesList);
         }
         synchronized (userMessagesList) {
             // Aguardando por uma mensagem ou timeout
