@@ -68,6 +68,9 @@ public class Controller implements Serializable {
 
     public void logoutUser(String username){
         Usuario user = instance.onlineUsers.get(username);
+        if(user == null){
+            return;
+        }
         user.turnStatus(0);
         instance.onlineUsers.remove(username);
         return;

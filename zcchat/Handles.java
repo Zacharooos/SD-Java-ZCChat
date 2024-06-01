@@ -200,7 +200,7 @@ public class Handles {
             Payload payloadObj = recieveRequest(exchange);
 
             // Obtendo valores do payload
-            String username = (String) payloadObj.get("username");
+            String username = (String) payloadObj.get("author");
 
             // Fazemdp ping pelo controller
             Controller controller = Controller.getController();

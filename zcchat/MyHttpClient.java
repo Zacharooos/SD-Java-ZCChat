@@ -284,6 +284,16 @@ public class MyHttpClient {
 
                 default:
                     System.out.println("Saindo");
+
+                    // Mandando logout para o servidor
+                    Payload logoutPayload = new Payload(cliente.get_username());
+
+                    try{
+                        Payload response = HttpConnect(logoutPayload, "logout");
+                    }catch(IOException err){
+                        err.printStackTrace();
+                    }
+
                     menu_index = 0;
                     break;
             }
