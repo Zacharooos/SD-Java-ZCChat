@@ -162,11 +162,13 @@ public class Controller implements Serializable {
     }
 
     // Funções de mensagens
-    public Payload sendMessage(String author, String messageText, String recipient){
+    public Payload sendMessage(String author, String recipient, String messageText){
         // Declarando payload de resposta
         Payload ret = new Payload("SERVER");
 
         // Verifiando se usuarios se encontram online
+
+        System.out.println("Recipient ->" + recipient + "\n");
         Usuario recipientObj = instance.onlineUsers.get(recipient);
         Usuario authorObj = instance.onlineUsers.get(author);
         if(recipientObj == null){
