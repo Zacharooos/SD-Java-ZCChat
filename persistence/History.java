@@ -1,11 +1,11 @@
 package persistence;
 
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 import zcchat.Usuario;
 
@@ -40,23 +40,16 @@ public class History {
     }
 
     public static void ReadHistory(Usuario cliente) {
-        try (DataInputStream dis = new DataInputStream(new FileInputStream("historico/" + cliente.get_username() + ".txt"))) {
-            
-            System.out.println(" < ============= Historico ============= >\n");
-            while (true) {
-                try {
-                    String str = dis.readUTF();
-                    System.out.println(str);
-                
-                } catch (Exception e) {
-                    System.out.println("\n < ================ FIM ================ >\n");
-                    break; 
-                }
+        System.out.println(" < ============= Historico ============= >\n");
+        try (BufferedReader br = new BufferedReader(new FileReader("historico/" + cliente.get_username() + ".txt"))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                System.out.println(linha);
             }
-
         } catch (IOException e) {
-            System.out.println("Erro ao recuperar historico: Nao existe");
+            e.printStackTrace();
         }
+        System.out.println("\n < ================ FIM ================ >\n");
     }
 
     public static void removeHistory(Usuario cliente) {
