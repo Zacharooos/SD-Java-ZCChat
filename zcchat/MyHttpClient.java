@@ -158,7 +158,6 @@ public class MyHttpClient {
         String input1;
 
         System.out.println("\nUsuario: " + cliente.get_username());
-        System.out.println("Status: " + cliente.get_status());
         System.out.println("Id: " + cliente.get_id() + "\n");
 
 

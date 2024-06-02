@@ -15,13 +15,11 @@ public class Controller implements Serializable {
     private Map<String, Usuario> users; // Lista de usuarios cadastrados
     private Map<String, Usuario> onlineUsers; // Lista de usuarios atualmente online
     private Map<String, List<Mensagem>> messageQueue; // Lista de mensagens a serem enviadas (para cada username)
-    private Map<String, HttpExchange> clientQueue; // Lista das conexões dos users. Utilizadas para enviar as mensagens.
 
     private Controller(){
         users = new TreeMap<>();
         onlineUsers = new TreeMap<>();
         messageQueue = new TreeMap<>();
-        clientQueue = new TreeMap<>();
     }
 
     public String addUser(String username, String password){
@@ -249,30 +247,6 @@ public class Controller implements Serializable {
         return ret;
     }
 
-    // Função que "entrega" mensagem ao destinatario
-    public boolean notifyClient(String clientName){
-        // Verificando se temos exchange e mensagens nas fila
-        HttpExchange clientExchange = instance.clientQueue.get(clientName);
-        List<Mensagem> userMessagesList = instance.messageQueue.get(clientName);
-        if (clientExchange == null || userMessagesList == null) {
-            return false;
-        }
-
-        // Montando payload com mensagem(s)
-        Payload response = new Payload("SERVER", "NEW MESSAGES");
-        response.put("messages", userMessagesList);
-
-        // Enviando resposta
-        try{
-            Handles.sendResponse(clientExchange, response);
-        }catch(IOException err){
-            err.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
 
     // Funções de persistence
     public static void load(){
@@ -280,6 +254,10 @@ public class Controller implements Serializable {
         if(instance == null){
             instance = new Controller(); 
         }
+
+        // Reiniciando lista de usuarios online
+        instance.onlineUsers.clear();
+
     }
 
     public static void save() {
