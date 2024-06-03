@@ -34,6 +34,7 @@ public class Controller implements Serializable {
     }
 
     public String deleteUser (String username){
+        instance.logoutUser(username);
         instance.users.remove(username, instance.users.get(username));
         Controller.save();
         return "OK";
