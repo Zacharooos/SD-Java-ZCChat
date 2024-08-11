@@ -129,25 +129,32 @@ public class Controller implements Serializable {
             instance.messageQueue.put(username, userMessagesList);
         }
         synchronized (userMessagesList) {
-            // Aguardando por uma mensagem ou timeout
-            try {
-                userMessagesList.wait(30000);
-                // Thread.sleep(15000);
-
-            } catch (InterruptedException err) {
-                err.printStackTrace();
-                return;
-            }
-
-            
-            // Verificando se tem mensagem nova e montando payload
             if (userMessagesList.isEmpty()) {
-                response = new Payload("SERVER", "OK");
+                // Aguardando por uma mensagem ou timeout
+                try {
+                    userMessagesList.wait(30000);
+                    // Thread.sleep(15000);
+    
+                } catch (InterruptedException err) {
+                    err.printStackTrace();
+                    return;
+                }
+    
+                
+                // Verificando se tem mensagem nova e montando payload
+                if (userMessagesList.isEmpty()) {
+                    response = new Payload("SERVER", "OK");
+                } else {
+                    response = new Payload("SERVER", "NEW MESSAGE");
+                    Mensagem message = userMessagesList.remove(0);
+                    response.put("message", message);
+                }
             } else {
                 response = new Payload("SERVER", "NEW MESSAGE");
                 Mensagem message = userMessagesList.remove(0);
                 response.put("message", message);
             }
+            
             
             // Enviando response
             Handles.sendResponse(exchange, response);
@@ -168,10 +175,10 @@ public class Controller implements Serializable {
         // Verifiando se usuarios se encontram online
 
         System.out.println("Recipient ->" + recipient + "\n");
-        Usuario recipientObj = instance.onlineUsers.get(recipient);
+        Usuario recipientObj = instance.users.get(recipient);
         Usuario authorObj = instance.onlineUsers.get(author);
         if(recipientObj == null){
-            ret.put("response", "DESTINATARIO OFFLINE");
+            ret.put("response", "DESTINATARIO NAO ENCONTRADO");
             return ret;
         }
         if (authorObj == null) {

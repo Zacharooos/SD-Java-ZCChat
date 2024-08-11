@@ -259,7 +259,6 @@ public class MyHttpClient {
                     System.out.println("Informe a sua mensagem:");
                     input2 = scanner.nextLine();
 
-                    System.out.println("Verificando se o contato está online...");
                     ClienteMessageContactOnline(cliente, input1, input2);
                     
                     break;
@@ -337,8 +336,8 @@ public class MyHttpClient {
             String response = responsePayloadObj.get("response").toString();            
             if (response.equals("OK")){
                 System.out.println("Mensagem enviada com sucesso!");
-            } else if (response.equals("DESTINATARIO OFFLINE")){
-                System.out.println("O usuario nao esta online no momento!");
+            } else if (response.equals("DESTINATARIO NAO ENCONTRADO")){
+                System.out.println("O destinatario nao foi encontrado no sistema.");
                 return;
             }
 
